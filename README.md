@@ -33,5 +33,6 @@ pip install -r .\requiremnets.txt
 
 ## Tests
 
+Pytest
 
 [Back to top](#top)
