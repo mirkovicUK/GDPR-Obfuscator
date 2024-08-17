@@ -19,11 +19,18 @@ should be anonymised.
 **It is expected that the tool will be deployed within the _AWS_ account.**
 
 ## Requirements
-Python 3.12
+Ensure you have installed latest python version.
 
+Check your python version
+```
+python --version
+```
+
+Local run
 ```
 pip install -r .\requiremnets.txt
 ```
+
 ## Tests
 
 
