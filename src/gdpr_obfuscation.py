@@ -50,9 +50,7 @@ def get_data_type(key):
         allowed_types = ['csv', 'json', 'parquet']
         data_type = key.split('.')[-1]
         if data_type not in allowed_types:
-            raise UnsupportedData(f'Function supports only {allowed_types}')
+            raise UnsupportedData(f'Function supports only {", ".join(allowed_types)} types.')
         return data_type
     except:
         raise
-
-    

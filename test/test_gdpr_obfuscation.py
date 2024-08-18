@@ -1,5 +1,5 @@
 from src.gdpr_obfuscation import get_bucket_and_key,\
-    get_data_type, UnsupportedData
+    get_data_type, UnsupportedData, gdpr_obfuscator
 import pytest
 
 @pytest.mark.describe('get_bucket_and_key()')
@@ -41,5 +41,5 @@ def test_raise_UnsuporetedData():
     _, key = get_bucket_and_key(s3_file)
     with pytest.raises(UnsupportedData) as excinfo:
         data_type = get_data_type(key)
-    assert "Function supports only ['csv', 'json', 'parquet']" in str(excinfo.value)
+    assert "Function supports only csv, json, parquet types." in str(excinfo.value)
     
