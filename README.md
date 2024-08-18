@@ -37,7 +37,6 @@ pip install -r .\requiremnets.txt
 
 ## Tests
 
-Code is tested with Pytest
-[TESTS]()
+Code is tested with [Pytest](https://docs.pytest.org/en/stable/)
 
 [Back to top](#top)
