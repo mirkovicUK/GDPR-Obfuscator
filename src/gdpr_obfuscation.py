@@ -13,10 +13,13 @@ def gdpr_obfuscator(file_path:str, pii_fields:list):
     :param: file_path (str) S3 location of the data file for obfuscation
     :param: pii_fields list of the names of the fields that are 
         required to be obfuscated
+
     :return: TBC <-----
     """
     bucket, key = get_bucket_and_key(file_path)
     data_type = get_data_type(key)
+    if data_type == 'csv':
+         pass
 
 
 def get_bucket_and_key(s3_file_path:str):
@@ -31,6 +34,10 @@ def get_bucket_and_key(s3_file_path:str):
     o = urlparse(s3_file_path, allow_fragments=False)
     return o.netloc, o.path.lstrip('/')
 
+class UnsupportedData(Exception):
+        """Traps error where data is not supported"""
+        pass
+
 def get_data_type(key):
     """
     Extract data type from s3 object key
@@ -39,4 +46,13 @@ def get_data_type(key):
     :param: s3 object key
     :raise: UnsupportedData Exeption 
     """
-    return key.split('.')[-1]
+    try:
+        allowed_types = ['csv', 'json', 'parquet']
+        data_type = key.split('.')[-1]
+        if data_type not in allowed_types:
+            raise UnsupportedData(f'Function supports only {allowed_types}')
+        return data_type
+    except:
+        raise
+
+    
