@@ -18,6 +18,16 @@ def gdpr_obfuscator(file_path:str, pii_fields:list):
     """
     bucket, key = get_bucket_and_key(file_path)
     data_type = get_data_type(key)
+    s3 = boto3.client('s3')
+    try:
+        response = s3.get_object(
+        Bucket = bucket,
+        Key = key)
+    except:
+        # Confirm expected required behaviour
+        raise
+    
+    
     if data_type == 'csv':
          pass
 
@@ -45,6 +55,7 @@ def get_data_type(key):
     
     :param: s3 object key
     :raise: UnsupportedData Exeption 
+    :return: (string) data type
     """
     try:
         allowed_types = ['csv', 'json', 'parquet']
