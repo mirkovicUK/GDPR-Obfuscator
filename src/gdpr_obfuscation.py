@@ -16,7 +16,7 @@ def gdpr_obfuscator(file_path:str, pii_fields:list):
     :return: TBC <-----
     """
     bucket, key = get_bucket_and_key(file_path)
-    data = 
+    data_type = get_data_type(key)
 
 
 def get_bucket_and_key(s3_file_path:str):
@@ -31,5 +31,12 @@ def get_bucket_and_key(s3_file_path:str):
     o = urlparse(s3_file_path, allow_fragments=False)
     return o.netloc, o.path.lstrip('/')
 
-
-
+def get_data_type(key):
+    """
+    Extract data type from s3 object key
+    Valid data type: csv, json, parquet
+    
+    :param: s3 object key
+    :raise: UnsupportedData Exeption 
+    """
+    return key.split('.')[-1]
