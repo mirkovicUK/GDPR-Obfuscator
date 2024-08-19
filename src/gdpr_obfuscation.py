@@ -13,7 +13,7 @@ def gdpr_obfuscator(file_path:str, pii_fields:list):
     data replaced with obfuscated strings.
 
     :param: file_path (str) S3 location of the data file for obfuscation
-    :param: pii_fields list of the names of the fields that to be obfuscated
+    :param: pii_fields (list) of the names of the fields that to be obfuscated
 
     :return: bytestream representation of a file with obfuscated data fields
     """
@@ -33,7 +33,6 @@ def get_bucket_and_key(s3_file_path:str):
     :param: s3_file_path (str) path to data on AWS s3
     :retunr: bucket , key (str) 
     """
-    
     o = urlparse(s3_file_path, allow_fragments=False)
     return o.netloc, o.path.lstrip('/')
 
@@ -67,7 +66,7 @@ def get_data(client, bucket, key):
     :param: client s3 boto client 
     :param: bucket (string) s3 bucket name
     :param: key (string) s3 data key 
-    :return: bytestream representation of a file
+    :return: bytestream representation of a data
     """
     try:
         response = client.get_object(
@@ -86,7 +85,26 @@ def get_data(client, bucket, key):
 
 def obfuscate_csv(data:str, pii_fields):
     """
+    Mask pii_fields in data 
 
+    :data: string representation of csv data
     :param: pii_fields list of the names of the fields that to be obfuscated
-    :return: string representation os csv file with pii masked
+    :return: string representation of csv file with pii masked
     """
+    dict_reader = csv.DictReader(StringIO(data))
+    masked = []
+    for row in dict_reader:
+        for field in pii_fields:
+            row[field] = '***'
+        masked.append(row)
+        
+    headers = list(masked[0].keys())
+    masked_bufer = StringIO()
+    writer = csv.DictWriter(masked_bufer, headers)
+    writer.writeheader()
+    writer.writerows(masked)
+
+    return masked_bufer.getvalue()
+    
+
+
