@@ -13,18 +13,16 @@ def gdpr_obfuscator(file_path:str, pii_fields:list):
     data replaced with obfuscated strings.
 
     :param: file_path (str) S3 location of the data file for obfuscation
-    :param: pii_fields list of the names of the fields that are 
-        required to be obfuscated
+    :param: pii_fields list of the names of the fields that to be obfuscated
 
-    :return: TBC <-----
+    :return: bytestream representation of a file with obfuscated data fields
     """
     bucket, key = get_bucket_and_key(file_path)
     data_type = get_data_type(key)
     s3 = boto3.client('s3')
-    
-    
+    data:bytes = get_data(s3, bucket, key)
     if data_type == 'csv':
-         pass
+        return obfuscate_csv(data.decode(), pii_fields).encode()
 
 
 def get_bucket_and_key(s3_file_path:str):
@@ -85,3 +83,10 @@ def get_data(client, bucket, key):
             # Confirm expected required behaviour
             pass
         raise
+
+def obfuscate_csv(data:str, pii_fields):
+    """
+
+    :param: pii_fields list of the names of the fields that to be obfuscated
+    :return: string representation os csv file with pii masked
+    """
