@@ -1,6 +1,8 @@
 from urllib.parse import urlparse
-import csv
-import boto3
+from botocore.exceptions import ClientError
+from io import StringIO
+import boto3, csv
+
 
 def gdpr_obfuscator(file_path:str, pii_fields:list):
     """
@@ -19,13 +21,6 @@ def gdpr_obfuscator(file_path:str, pii_fields:list):
     bucket, key = get_bucket_and_key(file_path)
     data_type = get_data_type(key)
     s3 = boto3.client('s3')
-    try:
-        response = s3.get_object(
-        Bucket = bucket,
-        Key = key)
-    except:
-        # Confirm expected required behaviour
-        raise
     
     
     if data_type == 'csv':
@@ -64,4 +59,29 @@ def get_data_type(key):
             raise UnsupportedData(f'Function supports only {", ".join(allowed_types)} types.')
         return data_type
     except:
+        # Confirm expected required behaviour
+        raise
+
+def get_data(client, bucket, key):
+    """
+    Retrieve data from s3
+
+    :param: client s3 boto client 
+    :param: bucket (string) s3 bucket name
+    :param: key (string) s3 data key 
+    :return: bytestream representation of a file
+    """
+    try:
+        response = client.get_object(
+        Bucket = bucket,
+        Key = key)
+        return response['Body'].read()
+    except ClientError as error:
+        if error.response['Error']['Code'] == 'NoSuchKey':
+            # Confirm expected required behaviour
+            pass
+        if error.response['Error']['Code'] == 'InvalidObjectState':
+            #Object is archived and inaccessible until restored.
+            # Confirm expected required behaviour
+            pass
         raise
