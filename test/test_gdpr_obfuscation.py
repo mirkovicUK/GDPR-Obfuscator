@@ -107,9 +107,9 @@ def test_raise_NoSuchKey_with_wrong_key():
         s3_data = get_data(client, bucket, 'wrong_key')
     assert 'NoSuchKey' in str(excinfo.value)
     
-    
+
 @pytest.mark.describe('obfuscate_csv()')
-@pytest.mark.it('Pure function that mask correct fields')
+@pytest.mark.it('Function mask correct fields')
 @mock_aws
 def test_Mask_correct_fields_and_return_str():
     s3_file = 's3://TESTbucket/some_folder/file.csv'

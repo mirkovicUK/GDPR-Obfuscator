@@ -83,9 +83,9 @@ def get_data(client, bucket, key):
             pass
         raise
 
-def obfuscate_csv(data:str, pii_fields):
+def obfuscate_csv(data:str, pii_fields:list):
     """
-    Mask pii_fields in data 
+    Mask pii_fields of data 
 
     :data: string representation of csv data
     :param: pii_fields list of the names of the fields that to be obfuscated
@@ -97,14 +97,10 @@ def obfuscate_csv(data:str, pii_fields):
         for field in pii_fields:
             row[field] = '***'
         masked.append(row)
-        
+    
     headers = list(masked[0].keys())
     masked_bufer = StringIO()
     writer = csv.DictWriter(masked_bufer, headers)
     writer.writeheader()
     writer.writerows(masked)
-
     return masked_bufer.getvalue()
-    
-
-
