@@ -50,7 +50,7 @@ And decorated with [pytest-testdox](https://pypi.org/project/pytest-testdox/) fo
 pip install pytest-testdox
 ```
 
-## Assumptions and Prerequisites
+## Assumptions_And_Prerequisites
 
 1. Data is stored in CSV, JSON, or parquet format in S3.
 
