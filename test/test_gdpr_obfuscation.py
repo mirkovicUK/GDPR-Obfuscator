@@ -86,12 +86,38 @@ def test_raise_NoSuchKey_with_wrong_key():
     client.put_object(
         Body = csv_data,
         Bucket = bucket,
-        Key = 'some_folder/file.csv')
+        Key = key)
     
     with pytest.raises(ClientError) as excinfo:
         get_data(client, bucket, 'wrong_key')
     assert 'NoSuchKey' in str(excinfo.value)
+
+@pytest.mark.describe('get_data()')
+@pytest.mark.it('Raise NoSuchBacket with wrong buket')
+@mock_aws
+def test_raise_NoSuchBucket_with_wrong_bucket():
+    s3_file = 's3://TESTbucket/some_folder/file.csv'
+    bucket, key  = get_bucket_and_key(s3_file)
     
+    csv_buffer = StringIO()
+    headers = ['name', 'surname', 'country']
+    data = [['test_name1', 'test_surname1', 'test_country1'],
+            ['test_name2', 'test_surname2', 'test_country2']]
+    writer = csv.writer(csv_buffer)
+    writer.writerow(headers)
+    writer.writerows(data)
+    csv_data = csv_buffer.getvalue()
+    
+    client = boto3.client('s3')
+    client.create_bucket(Bucket=bucket)
+    client.put_object(
+        Body = csv_data,
+        Bucket = bucket,
+        Key = key)
+    
+    with pytest.raises(ClientError) as excinfo:
+        get_data(client, 'WRONG_BUCKET', key)
+    assert 'NoSuchBucket' in str(excinfo.value)
 
 @pytest.mark.describe('obfuscate_csv()')
 @pytest.mark.it('Function mask correct fields')

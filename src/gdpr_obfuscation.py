@@ -77,6 +77,9 @@ def get_data(client, bucket, key):
         if error.response['Error']['Code'] == 'NoSuchKey':
             # Confirm expected required behaviour
             pass
+        if error.response['Error']['Code'] == 'NoSuchBucket':
+            # Confirm expected required behaviour
+            pass
         if error.response['Error']['Code'] == 'InvalidObjectState':
             #Object is archived and inaccessible until restored.
             # Confirm expected required behaviour
@@ -85,8 +88,11 @@ def get_data(client, bucket, key):
 
 def obfuscate_csv(data:str, pii_fields:list):
     """
-    Pure function, mask pii_fields of data received 
-    Behaviour: Will return empty str if data is empty
+    Pure function that mask pii_fields in data
+    Behaviour: 
+        :Will return empty str if data is empty
+        :If pii_fields contain fields different than data headers
+            function Will update data header to represent this
 
     :param: data (string) representation of csv data
     :param: pii_fields (list) of the names of the fields that to be obfuscated
