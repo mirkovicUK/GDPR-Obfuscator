@@ -38,5 +38,12 @@ pip install -r .\requiremnets.txt
 ## Tests
 
 Code is tested with [Pytest](https://docs.pytest.org/en/stable/)
+```
+pip install pytest
+```
+And decorated with [pytest-testdox](https://pypi.org/project/pytest-testdox/)
+```
+pip install pytest-testdox
+```
 
 [Back to top](#top)
