@@ -59,12 +59,11 @@ pip install pytest-testdox
 ## Assumptions_And_Prerequisites
 
 1. Data is stored in CSV, JSON, or parquet format in S3.
-
     CSV & JSON data masking rely on external Python libralies 
         :[Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for managing AWS resources 
         :[Botocore](https://botocore.amazonaws.com/v1/documentation/api/latest/index.html) for Error handling available witin AWS enviroment
-    Parquer data masking rely on external Python libralies
-    :TBC 
+        :[PyArrow](https://arrow.apache.org/docs/python/index.html) for parquet data handling
+ 
 
 2. Fields containing GDPR-sensitive data are known and will
       be supplied in advance, see [Usage](#Usage)
@@ -72,6 +71,22 @@ pip install pytest-testdox
 3. Data records will be supplied with a primary key.
 
 [Back to top](#top)
+
+## Usage
+pip instal
+```
+pip install github branch <-------->
+```
+import
+```
+from gdpr_obfuscation import gdpr_obfuscator
+```
+
+gdpr_obfuscator(file_path:str, pii_fields:list)
+
+:param: file_path (str) S3 location of the data file for obfuscation
+
+TBC TBC TBC TBC TBC TBC TBC TBC TBC
 
 
 [Back to top](#top)
