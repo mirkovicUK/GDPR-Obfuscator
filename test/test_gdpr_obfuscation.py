@@ -1,3 +1,4 @@
+import botocore.client
 from src.gdpr_obfuscation import get_bucket_and_key,\
         get_data_type, UnsupportedData, gdpr_obfuscator,\
         get_data, obfuscate_csv
@@ -5,7 +6,7 @@ from src.gdpr_obfuscation import get_bucket_and_key,\
 from io import StringIO
 from botocore.exceptions import ClientError
 from moto import mock_aws
-import pytest, boto3,csv, json
+import pytest, boto3, botocore, csv, json
 
 @pytest.mark.describe('get_bucket_and_key()')
 @pytest.mark.it('Pure function')
@@ -129,7 +130,7 @@ def test_Mask_correct_fields_and_return_str():
     client.put_object(
         Body = csv_data,
         Bucket = bucket,
-        Key = 'some_folder/file.csv')
+        Key = key)
     
     s3_data = get_data(client, bucket, key).decode()
     pii_fields = ['name', 'country']
@@ -139,5 +140,35 @@ def test_Mask_correct_fields_and_return_str():
             ['2','***', 'test_surname2', '***']]
     reader = csv.reader(StringIO(masked_csv))
     l = [row for row in reader]
+    
     assert l[0] == expected_output_headers
     assert l[1:] == expected_output_data
+
+@pytest.mark.describe('obfuscate_csv()')
+@pytest.mark.it('Is Pure function')
+@mock_aws
+def test_Is_Pure_function():
+    s3_file = 's3://TESTbucket/some_folder/file.csv'
+    bucket, key  = get_bucket_and_key(s3_file)
+    
+    csv_buffer = StringIO()
+    headers = ['id','name', 'surname', 'country']
+    data = [['1','test_name1', 'test_surname1', 'test_country1'],
+            ['2','test_name2', 'test_surname2', 'test_country2']]
+    writer = csv.writer(csv_buffer)
+    writer.writerow(headers)
+    writer.writerows(data)
+    csv_data = csv_buffer.getvalue()
+    
+    client = boto3.client('s3')
+    client.create_bucket(Bucket=bucket)
+    client.put_object(
+        Body = csv_data,
+        Bucket = bucket,
+        Key = key)
+    
+    s3_data = get_data(client, bucket, key).decode()
+    pii_fields = ['name', 'country']
+    obfuscate_csv(s3_data, pii_fields)
+
+    assert pii_fields == ['name', 'country']

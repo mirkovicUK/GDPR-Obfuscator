@@ -45,7 +45,7 @@ def get_data_type(key):
     Extract data type from s3 object key
     Valid data type: csv, json, parquet
     
-    :param: s3 object key
+    :param: key s3 object key
     :raise: UnsupportedData Exeption 
     :return: (string) data type
     """
