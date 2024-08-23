@@ -47,7 +47,7 @@ def get_data_type(key):
     
     :param: key s3 object key
     :raise: UnsupportedData Exeption 
-    :return: (string) data type
+    :return: (string) data type -> 'str'
     """
     try:
         allowed_types = ['csv', 'json', 'parquet']
@@ -55,7 +55,7 @@ def get_data_type(key):
         if data_type not in allowed_types:
             raise UnsupportedData(f'Function supports only {", ".join(allowed_types)} types.')
         return data_type
-    except:
+    except UnsupportedData:
         # Confirm expected required behaviour
         raise
 
@@ -85,10 +85,11 @@ def get_data(client, bucket, key):
 
 def obfuscate_csv(data:str, pii_fields:list):
     """
-    Mask pii_fields of data 
+    Pure function, mask pii_fields of data received 
+    Behaviour: Will return empty str if data is empty
 
-    :data: string representation of csv data
-    :param: pii_fields list of the names of the fields that to be obfuscated
+    :param: data (string) representation of csv data
+    :param: pii_fields (list) of the names of the fields that to be obfuscated
     :return: string representation of csv file with pii masked
     """
     dict_reader = csv.DictReader(StringIO(data))
@@ -97,8 +98,11 @@ def obfuscate_csv(data:str, pii_fields:list):
         for field in pii_fields:
             row[field] = '***'
         masked.append(row)
+    try:
+        headers = list(masked[0].keys())
+    except IndexError:
+        headers = []
     
-    headers = list(masked[0].keys())
     masked_bufer = StringIO()
     writer = csv.DictWriter(masked_bufer, headers)
     writer.writeheader()

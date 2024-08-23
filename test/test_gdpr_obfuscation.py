@@ -9,28 +9,12 @@ from moto import mock_aws
 import pytest, boto3, botocore, csv, json
 
 @pytest.mark.describe('get_bucket_and_key()')
-@pytest.mark.it('Pure function')
-def test_is_pure_function():
-    s3_file = 's3://my_bucket/some_folder/file.txt'
-    get_bucket_and_key(s3_file)
-    assert s3_file == 's3://my_bucket/some_folder/file.txt'
-
-@pytest.mark.describe('get_bucket_and_key()')
 @pytest.mark.it('Extract correct bucket and key from S3 data location')
 def test_extract_correct_bucket_and_key_from_S3_location():
     s3_file = 's3://my_bucket/some_folder/file.txt'
     bucket, key = get_bucket_and_key(s3_file)
     assert bucket == 'my_bucket'
     assert key == 'some_folder/file.txt'
-
-
-@pytest.mark.describe('get_data_type()')
-@pytest.mark.it('Pure function')
-def test_pure_function():
-    s3_file = 's3://my_bucket/some_folder/file.json'
-    _, key = get_bucket_and_key(s3_file)
-    get_data_type(key)
-    assert key == 'some_folder/file.json'
 
 @pytest.mark.describe('get_data_type()')
 @pytest.mark.it('Extract correct data type')
@@ -105,7 +89,7 @@ def test_raise_NoSuchKey_with_wrong_key():
         Key = 'some_folder/file.csv')
     
     with pytest.raises(ClientError) as excinfo:
-        s3_data = get_data(client, bucket, 'wrong_key')
+        get_data(client, bucket, 'wrong_key')
     assert 'NoSuchKey' in str(excinfo.value)
     
 
@@ -172,3 +156,4 @@ def test_Is_Pure_function():
     obfuscate_csv(s3_data, pii_fields)
 
     assert pii_fields == ['name', 'country']
+
