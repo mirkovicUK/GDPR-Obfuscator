@@ -53,6 +53,10 @@ And decorated with [pytest-testdox](https://pypi.org/project/pytest-testdox/) fo
 ```
 pip install pytest-testdox
 ```
+Run tests
+```
+pytest --disable-warnings --testdox -vvrP
+```
 
 [Back to top](#top)
 
