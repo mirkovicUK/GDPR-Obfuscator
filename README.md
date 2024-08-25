@@ -85,8 +85,8 @@ Imports
 ```
 from  src.gdpr_obfuscation import gdpr_obfuscator
 ```
-The tool will be invoked by sending a JSON string containing:<br>
-    the S3 location of the required CSV file for obfuscation<br>
+The tool should be invoked by sending a JSON string containing:<br>
+    the S3 location of the required CSV,JSON or parquet file for obfuscation<br>
     the names of the fields that are required to be obfuscated
 ```
 {
@@ -102,6 +102,9 @@ The tool will be invoked by sending a JSON string containing:<br>
 
 -:return: bytestream representation of a file with obfuscated data fields
 ```
+
+Example:
+Following example will create resources in aws acoun.....
 
 
 
