@@ -64,9 +64,9 @@ pytest --disable-warnings --testdox -vvrP
 
 1. Data is stored in CSV, JSON, or parquet format in S3.<br>
 This tool uses External Python libralies: <br>
-    &emsp:[Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for managing AWS resources <br>
-    &emsp:[Botocore](https://botocore.amazonaws.com/v1/documentation/api/latest/index.html) for Error handling available witin AWS enviroment<br>
-    &emsp:[PyArrow](https://arrow.apache.org/docs/python/index.html) for parquet data handling
+    &emsp;:[Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for managing AWS resources <br>
+    &emsp;:[Botocore](https://botocore.amazonaws.com/v1/documentation/api/latest/index.html) for Error handling available witin AWS enviroment<br>
+    &emsp;:[PyArrow](https://arrow.apache.org/docs/python/index.html) for parquet data handling
  
 
 2. Fields containing GDPR-sensitive data are known and will
