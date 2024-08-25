@@ -79,7 +79,7 @@ This tool uses External Python libralies: <br>
 ## Usage
 pip instal
 ```
-pip install git+https://github.com/mirkovicUK/GDPR-Obfuscator
+pip install "git+https://github.com/mirkovicUK/GDPR-Obfuscator.git"
 ```
 Imports
 ```
