@@ -64,8 +64,8 @@ pytest --disable-warnings --testdox -vvrP
 
 1. Data is stored in CSV, JSON, or parquet format in S3.
 External Python libralies 
-        :[Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for managing AWS resources 
-        :[Botocore](https://botocore.amazonaws.com/v1/documentation/api/latest/index.html) for Error handling available witin AWS enviroment
+        :[Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for managing AWS resources <br>
+        :[Botocore](https://botocore.amazonaws.com/v1/documentation/api/latest/index.html) for Error handling available witin AWS enviroment<br>
         :[PyArrow](https://arrow.apache.org/docs/python/index.html) for parquet data handling
  
 
@@ -90,7 +90,7 @@ The tool will be invoked by sending a JSON string containing:<br>
     the names of the fields that are required to be obfuscated
 ```
 {
-    "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv",<br> "pii_fields": ["name", "surname", "email_address"]
+    "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv","pii_fields": ["name", "surname", "email_address"]
 }
 ```
 ```
