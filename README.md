@@ -81,7 +81,7 @@ pip instal
 ```
 pip install github branch <-------->
 ```
-import
+Imports
 ```
 from gdpr_obfuscation import gdpr_obfuscator
 ```
@@ -103,9 +103,7 @@ gdpr_obfuscator(JSON:str)
 :return: bytestream representation of a file with obfuscated data fields
 ```
 
-:param: file_path (str) S3 location of the data file for obfuscation
-
-TBC TBC TBC TBC TBC TBC TBC TBC TBC
+text in Aqua
 
 
 [Back to top](#top)
