@@ -77,13 +77,13 @@ This tool uses External Python libralies: <br>
 [Back to top](#top)
 
 ## Usage
-pip instal
+pip install
 ```
 pip install "git+https://github.com/mirkovicUK/GDPR-Obfuscator.git"
 ```
 Imports
 ```
-from gdpr_obfuscation import gdpr_obfuscator
+from  src.gdpr_obfuscation import gdpr_obfuscator
 ```
 The tool will be invoked by sending a JSON string containing:<br>
     the S3 location of the required CSV file for obfuscation<br>
