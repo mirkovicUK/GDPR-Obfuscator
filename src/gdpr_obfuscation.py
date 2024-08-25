@@ -93,7 +93,7 @@ def obfuscate_csv(data:str, pii_fields:list):
     Behaviour: 
         :Will return empty str if data is empty
         :If pii_fields contain fields different than data headers
-            function Will update data header to represent this
+            function will update data header to represent this
 
     :param: data (string) representation of csv data
     :param: pii_fields (list) of the names of the fields that to be obfuscated

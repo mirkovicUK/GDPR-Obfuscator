@@ -6,7 +6,7 @@ from src.gdpr_obfuscation import get_bucket_and_key,\
 from io import StringIO
 from botocore.exceptions import ClientError
 from moto import mock_aws
-import pytest, boto3, botocore, csv, json
+import pytest, boto3, botocore, csv, json, sys, time
 
 @pytest.mark.describe('get_bucket_and_key()')
 @pytest.mark.it('Extract correct bucket and key from S3 data location')
@@ -246,3 +246,68 @@ def test_Return_bytestream_representation_of_data():
     json_str = json.dumps(d)
     masked_csv = gdpr_obfuscator(json_str)
     assert isinstance(masked_csv, bytes)
+
+@pytest.mark.describe('gdpr_obfuscator()')
+@pytest.mark.it('Function output is compatible with the boto3 S3 Put Object')
+@mock_aws
+def test_Function_outputis_compatible_with_the_boto3_S3_Put_Object():
+    csv_buffer = StringIO()
+    headers = ['id','name', 'surname', 'country']
+    data = [['1','test_name1', 'test_surname1', 'test_country1'],
+            ['2','test_name2', 'test_surname2', 'test_country2']]
+    writer = csv.writer(csv_buffer)
+    writer.writerow(headers)
+    writer.writerows(data)
+    csv_data = csv_buffer.getvalue()
+
+    client = boto3.client('s3')
+    client.create_bucket(Bucket='TESTbucket')
+    client.put_object(
+        Body = csv_data,
+        Bucket = 'TESTbucket',
+        Key = 'some_folder/file.csv')
+    
+    s3_file = 's3://TESTbucket/some_folder/file.csv'
+    pii_fields = ['name', 'country']
+    d = {}
+    d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields
+    response = client.put_object(
+        Body = gdpr_obfuscator(json.dumps(d)),
+        Bucket = 'TESTbucket',
+        Key = 'Masked_TEST_data'
+    )
+    assert response['ResponseMetadata']['HTTPStatusCode'] == 200
+
+@pytest.mark.describe('gdpr_obfuscator()')
+@pytest.mark.it('Function process 1MB data is in less than 1min')
+@mock_aws
+def test_Function_process_1MB_data_in_less_than_1min():
+    headers = ['id','name', 'surname', 'country']
+    data = []
+    counter = 1
+    while sys.getsizeof(data) <= 1000000:
+        str_counter = str(counter)
+        data.append([str_counter, 'test_name' + str_counter, 
+                     'test_surname' + str_counter, 'test_country' + str_counter])
+        counter += 1
+    csv_buffer = StringIO()
+    writer = csv.writer(csv_buffer)
+    writer.writerow(headers)
+    writer.writerows(data)
+    csv_data = csv_buffer.getvalue()
+
+    client = boto3.client('s3')
+    client.create_bucket(Bucket='TESTbucket')
+    client.put_object(
+        Body = csv_data,
+        Bucket = 'TESTbucket',
+        Key = 'some_folder/file.csv')
+    
+    s3_file = 's3://TESTbucket/some_folder/file.csv'
+    pii_fields = headers
+    d = {}
+    d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields
+    start_time = time.time()
+    gdpr_obfuscator(json.dumps(d))
+    assert time.time() - start_time < 60
+    
