@@ -2,6 +2,7 @@
 name = "GDPR-Obfuscator"
 version = "2024.0.0"
 readme = "README.md"
+dependencies = ["boto3"]
 
 [build-system]
 requires = ["setuptools >= 61.0"]
@@ -9,5 +10,5 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["gdpr_obfuscation.py"]
+include = ["gdpr_obfuscation"]
 
