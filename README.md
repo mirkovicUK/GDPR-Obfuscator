@@ -102,8 +102,9 @@ gdpr_obfuscator(JSON:str)
 
 :return: bytestream representation of a file with obfuscated data fields
 ```
-
-text in Aqua
+```diff
+- text in Aqua
+```
 
 
 [Back to top](#top)
