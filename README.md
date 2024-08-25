@@ -93,18 +93,16 @@ The tool will be invoked by sending a JSON string containing:<br>
     "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv","pii_fields": ["name", "surname", "email_address"]
 }
 ```
-```
-gdpr_obfuscator(JSON:str)
+```diff
+-gdpr_obfuscator(JSON:str)
 
-:param: JSON (string) containing:
+-:param: JSON (string) containing:
         the S3 location of the required CSV file for obfuscation
         the names of the fields that are required to be obfuscated
 
-:return: bytestream representation of a file with obfuscated data fields
+-:return: bytestream representation of a file with obfuscated data fields
 ```
-```diff
-- text in Aqua
-```
+
 
 
 [Back to top](#top)
