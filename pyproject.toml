@@ -9,6 +9,5 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ['src']
-include = ["gdpr_obfuscation"]
-exclude = ["gdpr_obfuscation.tests*"]
+include = ["gdpr_obfuscation.py"]
 
