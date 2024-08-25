@@ -63,7 +63,7 @@ pytest --disable-warnings --testdox -vvrP
 ## Assumptions_And_Prerequisites
 
 1. Data is stored in CSV, JSON, or parquet format in S3.
-    CSV & JSON data masking rely on external Python libralies 
+External Python libralies 
         :[Boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html) for managing AWS resources 
         :[Botocore](https://botocore.amazonaws.com/v1/documentation/api/latest/index.html) for Error handling available witin AWS enviroment
         :[PyArrow](https://arrow.apache.org/docs/python/index.html) for parquet data handling

@@ -33,7 +33,6 @@ def test_raise_UnsuporetedData():
         get_data_type(key)
     assert "Function supports only csv, json, parquet types." in str(excinfo.value)
 
-
 @pytest.mark.describe('get_data()')
 @pytest.mark.it('Return correct data')
 @mock_aws
@@ -182,7 +181,6 @@ def test_Is_Pure_function():
     obfuscate_csv(s3_data, pii_fields)
 
     assert pii_fields == ['name', 'country']
-
 
 @pytest.mark.describe('gdpr_obfuscator()')
 @pytest.mark.it('Return data with correct pii_fields masked')
