@@ -206,7 +206,10 @@ def test_Return_data_with_correct_pii_fields_masked():
     
     s3_file = 's3://TESTbucket/some_folder/file.csv'
     pii_fields = ['name', 'country']
-    masked_csv = gdpr_obfuscator(s3_file, pii_fields).decode()
+    d = {}
+    d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields
+    json_str = json.dumps(d)
+    masked_csv = gdpr_obfuscator(json_str).decode()
     expected_output_headers = ['id','name', 'surname', 'country']
     expected_output_data = [['1','***', 'test_surname1', '***'],
             ['2','***', 'test_surname2', '***']]
@@ -238,5 +241,8 @@ def test_Return_bytestream_representation_of_data():
     
     s3_file = 's3://TESTbucket/some_folder/file.csv'
     pii_fields = ['name', 'country']
-    masked_csv = gdpr_obfuscator(s3_file, pii_fields)
+    d = {}
+    d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields
+    json_str = json.dumps(d)
+    masked_csv = gdpr_obfuscator(json_str)
     assert isinstance(masked_csv, bytes)

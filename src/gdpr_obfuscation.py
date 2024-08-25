@@ -1,10 +1,10 @@
 from urllib.parse import urlparse
 from botocore.exceptions import ClientError
 from io import StringIO
-import boto3, csv
+import boto3, csv, json
 
 
-def gdpr_obfuscator(file_path:str, pii_fields:list):
+def gdpr_obfuscator(JSON_str:str):
     """
     Retrieve data ingested to AWS S3 and
     intercept personally identifiable information (PII).
@@ -12,17 +12,18 @@ def gdpr_obfuscator(file_path:str, pii_fields:list):
     copy of the input file but with the sensitive
     data replaced with obfuscated strings.
 
-    :param: file_path (str) S3 location of the data file for obfuscation
-    :param: pii_fields (list) of the names of the fields that to be obfuscated
-
+    :param: JSON (string) containing:
+        the S3 location of the required CSV file for obfuscation
+        the names of the fields that are required to be obfuscated
     :return: bytestream representation of a file with obfuscated data fields
     """
-    bucket, key = get_bucket_and_key(file_path)
+    py_dict = json.loads(JSON_str)
+    bucket, key = get_bucket_and_key(py_dict['file_to_obfuscate'])
     data_type = get_data_type(key)
     s3 = boto3.client('s3')
     data:bytes = get_data(s3, bucket, key)
     if data_type == 'csv':
-        return obfuscate_csv(data.decode(), pii_fields).encode()
+        return obfuscate_csv(data.decode(), py_dict['pii_fields']).encode()
 
 
 def get_bucket_and_key(s3_file_path:str):
