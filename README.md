@@ -86,11 +86,12 @@ import
 from gdpr_obfuscation import gdpr_obfuscator
 ```
 The tool will be invoked by sending a JSON string containing:
-    ● the S3 location of the required CSV file for obfuscation
-    ● the names of the fields that are required to be obfuscated
+    the S3 location of the required CSV file for obfuscation
+    the names of the fields that are required to be obfuscated
 ```
 {
-    "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv", "pii_fields": ["name", "surname", "email_address"]}
+    "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv", "pii_fields": ["name", "surname", "email_address"]
+}
 ```
 ```
 gdpr_obfuscator(JSON:str)
