@@ -93,14 +93,8 @@ The tool should be invoked by sending a JSON string containing:<br>
     "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv","pii_fields": ["name", "surname", "email_address"]
 }
 ```
-```diff
--gdpr_obfuscator(JSON:str)
-
--:param: JSON (string) containing:
--&emsp;"file_to_obfuscate" key:
--&emsp;the S3 location of the required CSV file for obfuscation
--&emsp;"pii_fields" key:
--&emsp;the names of the fields that are required to be obfuscated
+```
+gdpr_obfuscator(JSON:str)
 ```
 
 Example:
