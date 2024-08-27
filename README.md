@@ -97,10 +97,10 @@ The tool should be invoked by sending a JSON string containing:<br>
 -gdpr_obfuscator(JSON:str)
 
 -:param: JSON (string) containing:
-        the S3 location of the required CSV file for obfuscation
-        the names of the fields that are required to be obfuscated
-
--:return: bytestream representation of a file with obfuscated data fields
+-&emsp;"file_to_obfuscate" key:
+-&emsp;the S3 location of the required CSV file for obfuscation
+-&emsp;"pii_fields" key:
+-&emsp;the names of the fields that are required to be obfuscated
 ```
 
 Example:
