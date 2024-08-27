@@ -182,9 +182,9 @@ def test_Is_Pure_function():
     assert pii_fields == ['name', 'country']
 
 @pytest.mark.describe('gdpr_obfuscator()')
-@pytest.mark.it('Return data with correct pii_fields masked')
+@pytest.mark.it('Return data with correct pii_fields masked csv data')
 @mock_aws
-def test_Return_data_with_correct_pii_fields_masked():
+def test_Return_data_with_correct_pii_fields_masked_csv_data():
     csv_buffer = StringIO()
     headers = ['id','name', 'surname', 'country']
     data = [['1','test_name1', 'test_surname1', 'test_country1'],
@@ -217,9 +217,43 @@ def test_Return_data_with_correct_pii_fields_masked():
     assert l[1:] == expected_output_data
 
 @pytest.mark.describe('gdpr_obfuscator()')
-@pytest.mark.it('Return bytestream representation of data')
+@pytest.mark.it('Return data with correct pii_fields masked json data')
 @mock_aws
-def test_Return_bytestream_representation_of_data():
+def test_Return_data_with_correct_pii_fields_masked_json_data():
+    json_data = []
+    for i in range(2):
+        json_data.append({
+            'id' : i,
+            'name' : 'test_name' + str(i),
+            'surname' : 'test_surname' + str(i),
+            'country' : 'test_country' + str(i)
+        })
+    expected_output = json.dumps([
+        {"id": 0, "name": "***", "surname": "test_surname0", "country": "***"},
+        {"id": 1, "name": "***", "surname": "test_surname1", "country": "***"}
+    ])
+
+    client = boto3.client('s3')
+    client.create_bucket(Bucket='TESTbucket')
+    client.put_object(
+        Body = json.dumps(json_data),
+        Bucket = 'TESTbucket',
+        Key = 'some_folder/file.json')
+    
+    s3_file = 's3://TESTbucket/some_folder/file.json'
+    pii_fields = ['name', 'country']
+    json_str = json.dumps({
+        'file_to_obfuscate' : s3_file,
+        'pii_fields' : pii_fields
+    })
+    masked_json = gdpr_obfuscator(json_str).decode()
+    
+    assert masked_json == expected_output
+
+@pytest.mark.describe('gdpr_obfuscator()')
+@pytest.mark.it('Return bytestream representation of data csv data')
+@mock_aws
+def test_Return_bytestream_representation_of_data_csv_data():
     csv_buffer = StringIO()
     headers = ['id','name', 'surname', 'country']
     data = [['1','test_name1', 'test_surname1', 'test_country1'],
@@ -237,6 +271,34 @@ def test_Return_bytestream_representation_of_data():
         Key = 'some_folder/file.csv')
     
     s3_file = 's3://TESTbucket/some_folder/file.csv'
+    pii_fields = ['name', 'country']
+    d = {}
+    d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields
+    json_str = json.dumps(d)
+    masked_csv = gdpr_obfuscator(json_str)
+    assert isinstance(masked_csv, bytes)
+
+@pytest.mark.describe('gdpr_obfuscator()')
+@pytest.mark.it('Return bytestream representation of data json data')
+@mock_aws
+def test_Return_bytestream_representation_of_data_json_data():
+    json_data = []
+    for i in range(2):
+        json_data.append({
+            'id' : i,
+            'name' : 'test_name' + str(i),
+            'surname' : 'test_surname' + str(i),
+            'country' : 'test_country' + str(i)
+        })
+
+    client = boto3.client('s3')
+    client.create_bucket(Bucket='TESTbucket')
+    client.put_object(
+        Body = json.dumps(json_data),
+        Bucket = 'TESTbucket',
+        Key = 'some_folder/file.json')
+    
+    s3_file = 's3://TESTbucket/some_folder/file.json'
     pii_fields = ['name', 'country']
     d = {}
     d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields

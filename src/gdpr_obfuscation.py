@@ -1,10 +1,10 @@
 from urllib.parse import urlparse
 from botocore.exceptions import ClientError
 from io import StringIO
-import boto3, csv, json
+import boto3, csv, json,botocore
 
 
-def gdpr_obfuscator(JSON_str:str):
+def gdpr_obfuscator(JSON_str:str) -> bytes:
     """
     Retrieve data ingested to AWS S3 and
     intercept personally identifiable information (PII).
@@ -12,8 +12,8 @@ def gdpr_obfuscator(JSON_str:str):
     copy of the input file but with the sensitive
     data replaced with obfuscated strings.
 
-    Exepts csv, json and parquet data file format
-    JSON = [{data1}, {data2}...]
+    Exepts csv, json or parquet data file format
+        JSON data format = [{data1}, {data2}...]
     
     :param: JSON_str (string) containing:
     "file_to_obfuscate" key:
@@ -35,18 +35,18 @@ def gdpr_obfuscator(JSON_str:str):
     s3 = boto3.client('s3')
     data:bytes = get_data(s3, bucket, key)
     if data_type == 'csv':
-        return obfuscate_csv(data.decode(), py_dict['pii_fields']).encode()
+        masked = obfuscate_csv(data.decode(), py_dict['pii_fields']).encode()
     elif data_type == 'json':
-        pass
+        masked = obfuscate_json(data, py_dict['pii_fields']).encode()
+    return masked
 
-
-def get_bucket_and_key(s3_file_path:str):
+def get_bucket_and_key(s3_file_path:str) -> tuple[str, str]:
     """
     Extract S3 bucket name and key of the object from s3 file path
     expect file path like 's3://my_backet/some_folder/file.txt
     
     :param: s3_file_path (str) path to data on AWS s3
-    :retunr: bucket , key (str) 
+    :retunr: Tuple[str, str]bucket , key (str) 
     """
     o = urlparse(s3_file_path, allow_fragments=False)
     return o.netloc, o.path.lstrip('/')
@@ -55,7 +55,7 @@ class UnsupportedData(Exception):
         """Traps error where data is not supported"""
         pass
 
-def get_data_type(key):
+def get_data_type(key)->str:
     """
     Extract data type from s3 object key
     Valid data type: csv, json, parquet
@@ -75,7 +75,7 @@ def get_data_type(key):
         # log to cloud watch?
         raise
 
-def get_data(client, bucket, key):
+def get_data(client:botocore.client, bucket:str, key:str) -> bytes:
     """
     Retrieve data from s3
 
@@ -105,7 +105,7 @@ def get_data(client, bucket, key):
             pass
         raise
 
-def obfuscate_csv(data:str, pii_fields:list):
+def obfuscate_csv(data:str, pii_fields:list) -> str:
     """
     Pure function that mask pii_fields in data
     Behaviour: 
@@ -115,7 +115,7 @@ def obfuscate_csv(data:str, pii_fields:list):
 
     :param: data (string) representation of csv data
     :param: pii_fields (list) of the names of the fields that to be obfuscated
-    :return: string representation of csv file with pii masked
+    :return: csv file with pii masked
     """
     dict_reader = csv.DictReader(StringIO(data))
     masked = []
@@ -134,7 +134,7 @@ def obfuscate_csv(data:str, pii_fields:list):
     writer.writerows(masked)
     return masked_bufer.getvalue()
 
-def obfuscate_json(data:bytes, pii_fields:list):
+def obfuscate_json(data:bytes, pii_fields:list) -> str:
     """
     Pure function that mask pii_fields in data
     Behaviour: 
@@ -145,7 +145,7 @@ def obfuscate_json(data:bytes, pii_fields:list):
 
     :param: data (bytes) representation of json data
     :param: pii_fields (list) of the names of the fields that to be obfuscated
-    :return: string representation of json file with pii masked
+    :return: parsed object with pii masked
     """
     try:
         data_list = json.loads(data)
