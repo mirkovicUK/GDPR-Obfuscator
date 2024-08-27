@@ -98,16 +98,16 @@ gdpr_obfuscator(JSON:str)
 ```
 
 Example:
-Following example will create resources: 
+Following example will create resources: <br>
 &emsp;:[S3](https://aws.amazon.com/s3/), and upload some data for testing, <br>
 example is designed to clean all resources, and to work with AWS Free Tier.
 
 Example will expect AWS credentials in python .env file
 
-bucket='unique bucket name'
-aws_access_key_id='Your account access key'
-aws_secret_access_key= 'Your account secret access key'
-region_name = 'region_name'
+bucket='unique bucket name' <br>
+aws_access_key_id='Your account access key'<br>
+aws_secret_access_key= 'Your account secret access key'<br>
+region_name = 'region_name'<br>
 
 
 
