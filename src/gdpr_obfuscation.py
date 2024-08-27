@@ -13,8 +13,17 @@ def gdpr_obfuscator(JSON_str:str):
     data replaced with obfuscated strings.
 
     :param: JSON (string) containing:
+    "file_to_obfuscate" key:
         the S3 location of the required CSV file for obfuscation
+    "pii_fields" key:
         the names of the fields that are required to be obfuscated
+    
+    example:
+    {
+        "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file1.csv",
+        "pii_fields": ["name", "email_address"]
+    }
+
     :return: bytestream representation of a file with obfuscated data fields
     """
     py_dict = json.loads(JSON_str)
