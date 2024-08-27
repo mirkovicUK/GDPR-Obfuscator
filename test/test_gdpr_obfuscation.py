@@ -1,12 +1,11 @@
-import botocore.client
 from src.gdpr_obfuscation import get_bucket_and_key,\
         get_data_type, UnsupportedData, gdpr_obfuscator,\
-        get_data, obfuscate_csv
+        get_data, obfuscate_csv, obfuscate_json
 
 from io import StringIO
 from botocore.exceptions import ClientError
 from moto import mock_aws
-import pytest, boto3, botocore, csv, json, sys, time
+import pytest, boto3, csv, json, sys, time
 
 @pytest.mark.describe('get_bucket_and_key()')
 @pytest.mark.it('Extract correct bucket and key from S3 data location')
@@ -309,3 +308,47 @@ def test_Function_process_1MB_data_in_less_than_1min():
     gdpr_obfuscator(json.dumps(d))
     assert time.time() - start_time < 60
     
+@pytest.mark.describe('obfuscate_json()')
+@pytest.mark.it('Function mask correct fields')
+@mock_aws
+def test_Function_mask_correct_fields():
+    s3_file = 's3://TESTbucket/some_folder/file.json'
+    bucket, key  = get_bucket_and_key(s3_file)
+    
+    json_data = []
+    for i in range(2):
+        json_data.append({
+            'id' : i,
+            'name' : 'test_name' + str(i),
+            'surname' : 'test_surname' + str(i),
+            'country' : 'test_country' + str(i)
+        })
+    expected_output = json.dumps([
+        {"id": 0, "name": "***", "surname": "test_surname0", "country": "***"},
+        {"id": 1, "name": "***", "surname": "test_surname1", "country": "***"}
+    ])
+
+    client = boto3.client('s3')
+    client.create_bucket(Bucket=bucket)
+    client.put_object(
+        Body = json.dumps(json_data),
+        Bucket = bucket,
+        Key = key)  
+    s3_data = get_data(client, bucket, key)
+    pii_fields = ['name', 'country']
+    masked_data = obfuscate_json(s3_data, pii_fields)
+    assert expected_output == masked_data
+    
+@pytest.mark.describe('obfuscate_json()')
+@pytest.mark.it('Return empty serilized list when data oject is empty')
+def test_Return_empty_serilized_list_when_encount_empty_data_obj():  
+    pii_fields = ['name', 'country']
+    masked_data = obfuscate_json(b'', pii_fields)
+    assert json.dumps([]) == masked_data
+
+@pytest.mark.describe('obfuscate_json()')
+@pytest.mark.it('Is pure function')
+def test_Is_pure_function():  
+    pii_fields = ['name', 'country']
+    obfuscate_json(b'', pii_fields)
+    assert pii_fields == ['name', 'country']

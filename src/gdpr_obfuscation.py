@@ -12,11 +12,14 @@ def gdpr_obfuscator(JSON_str:str):
     copy of the input file but with the sensitive
     data replaced with obfuscated strings.
 
-    :param: JSON (string) containing:
+    Exepts csv, json and parquet data file format
+    JSON = [{data1}, {data2}...]
+    
+    :param: JSON_str (string) containing:
     "file_to_obfuscate" key:
-        the S3 location of the required CSV file for obfuscation
+        the S3 location of the required file for obfuscation
     "pii_fields" key:
-        the names of the fields that are required to be obfuscated
+        the list with names of the fields that are required to be obfuscated
     
     example:
     {
@@ -33,6 +36,8 @@ def gdpr_obfuscator(JSON_str:str):
     data:bytes = get_data(s3, bucket, key)
     if data_type == 'csv':
         return obfuscate_csv(data.decode(), py_dict['pii_fields']).encode()
+    elif data_type == 'json':
+        pass
 
 
 def get_bucket_and_key(s3_file_path:str):
@@ -67,6 +72,7 @@ def get_data_type(key):
         return data_type
     except UnsupportedData:
         # Confirm expected required behaviour
+        # log to cloud watch?
         raise
 
 def get_data(client, bucket, key):
@@ -86,13 +92,16 @@ def get_data(client, bucket, key):
     except ClientError as error:
         if error.response['Error']['Code'] == 'NoSuchKey':
             # Confirm expected required behaviour
+            # log to cloud watch?
             pass
-        if error.response['Error']['Code'] == 'NoSuchBucket':
+        elif error.response['Error']['Code'] == 'NoSuchBucket':
             # Confirm expected required behaviour
+            # log to cloud watch?
             pass
-        if error.response['Error']['Code'] == 'InvalidObjectState':
+        elif error.response['Error']['Code'] == 'InvalidObjectState':
             #Object is archived and inaccessible until restored.
             # Confirm expected required behaviour
+            # log to cloud watch?
             pass
         raise
 
@@ -124,3 +133,25 @@ def obfuscate_csv(data:str, pii_fields:list):
     writer.writeheader()
     writer.writerows(masked)
     return masked_bufer.getvalue()
+
+def obfuscate_json(data:bytes, pii_fields:list):
+    """
+    Pure function that mask pii_fields in data
+    Behaviour: 
+        :Will return empty serilized list if data is empty or wrong format
+            expect bytes data in format [{data1}, {data2} ...]
+        :If pii_fields contain fields different than dict key
+            function will update data vith new key:value to represent this
+
+    :param: data (bytes) representation of json data
+    :param: pii_fields (list) of the names of the fields that to be obfuscated
+    :return: string representation of json file with pii masked
+    """
+    try:
+        data_list = json.loads(data)
+    except json.decoder.JSONDecodeError:
+        data_list = []
+    for x in data_list:
+        for y in pii_fields:
+            x[y] = '***'
+    return json.dumps(data_list)
