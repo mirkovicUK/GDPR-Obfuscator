@@ -4,7 +4,7 @@ from io import StringIO
 import boto3, csv, json,botocore
 
 
-def gdpr_obfuscator(JSON_str:str) -> bytes:
+def gdpr_obfuscator(JSON:str) -> bytes:
     """
     Retrieve data ingested to AWS S3 and
     intercept personally identifiable information (PII).
@@ -15,7 +15,7 @@ def gdpr_obfuscator(JSON_str:str) -> bytes:
     Exepts csv, json or parquet data file format
         JSON data format = [{data1}, {data2}...]
     
-    :param: JSON_str (string) containing:
+    :param: JSON (string) containing:
     "file_to_obfuscate" key:
         the S3 location of the required file for obfuscation
     "pii_fields" key:
@@ -29,7 +29,7 @@ def gdpr_obfuscator(JSON_str:str) -> bytes:
 
     :return: bytestream representation of a file with obfuscated data fields
     """
-    py_dict = json.loads(JSON_str)
+    py_dict = json.loads(JSON)
     bucket, key = get_bucket_and_key(py_dict['file_to_obfuscate'])
     data_type = get_data_type(key)
     s3 = boto3.client('s3')
@@ -43,10 +43,11 @@ def gdpr_obfuscator(JSON_str:str) -> bytes:
 def get_bucket_and_key(s3_file_path:str) -> tuple[str, str]:
     """
     Extract S3 bucket name and key of the object from s3 file path
-    expect file path like 's3://my_backet/some_folder/file.txt
+    expect file path like:
+        's3://backet_name/folder1/../file.txt'
     
     :param: s3_file_path (str) path to data on AWS s3
-    :retunr: Tuple[str, str]bucket , key (str) 
+    :return: Tuple[str, str] Bucket, Key 
     """
     o = urlparse(s3_file_path, allow_fragments=False)
     return o.netloc, o.path.lstrip('/')
@@ -55,25 +56,20 @@ class UnsupportedData(Exception):
         """Traps error where data is not supported"""
         pass
 
-def get_data_type(key)->str:
+def get_data_type(key:str) -> str:
     """
     Extract data type from s3 object key
     Valid data type: csv, json, parquet
     
-    :param: key s3 object key
+    :param: key (string) s3 object key
     :raise: UnsupportedData Exeption 
-    :return: (string) data type -> 'str'
+        when data not csv, json or parquet
+    :return: (string) indicating data type
     """
-    try:
-        allowed_types = ['csv', 'json', 'parquet']
-        data_type = key.split('.')[-1]
-        if data_type not in allowed_types:
-            raise UnsupportedData(f'Function supports only {", ".join(allowed_types)} types.')
-        return data_type
-    except UnsupportedData:
-        # Confirm expected required behaviour
-        # log to cloud watch?
-        raise
+    allowed_types = ['csv', 'json', 'parquet']
+    if (data_type := key.split('.')[-1]) not in allowed_types:
+        raise UnsupportedData(f'Function supports only {", ".join(allowed_types)} types.')
+    return data_type
 
 def get_data(client:botocore.client, bucket:str, key:str) -> bytes:
     """

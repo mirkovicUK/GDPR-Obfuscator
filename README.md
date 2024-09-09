@@ -38,7 +38,7 @@ python --version
 
 Local run
 ```
-pip install -r requiremnets.txt
+pip install -r ./requiremnets.txt
 ```
 
 [Back to top](#top)
