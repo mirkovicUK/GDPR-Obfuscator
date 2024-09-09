@@ -94,11 +94,6 @@ def get_data(client:botocore.client, bucket:str, key:str) -> bytes:
             # Confirm expected required behaviour
             # log to cloud watch?
             pass
-        elif error.response['Error']['Code'] == 'InvalidObjectState':
-            #Object is archived and inaccessible until restored.
-            # Confirm expected required behaviour
-            # log to cloud watch?
-            pass
         raise
 
 def obfuscate_csv(data:str, pii_fields:list) -> str:

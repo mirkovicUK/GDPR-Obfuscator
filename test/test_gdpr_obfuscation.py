@@ -23,20 +23,20 @@ def test_extract_correct_data_type():
     data_type = get_data_type(key)
     assert data_type == 'csv'
 
-# @pytest.mark.describe('get_data_type()')
-# @pytest.mark.it('Raise UnsupportedData exeption')
-# def test_raise_UnsuporetedData():
-#     s3_file = 's3://my_bucket/some_folder/file.txt'
-#     _, key = get_bucket_and_key(s3_file)
-#     with pytest.raises(UnsupportedData) as excinfo:
-#         get_data_type(key)
-#     assert "Function supports only csv, json, parquet types." in str(excinfo.value)
+@pytest.mark.describe('get_data_type()')
+@pytest.mark.it('Raise UnsupportedData exeption')
+def test_raise_UnsuporetedData():
+    s3_file = 's3://my_bucket/some_folder/file.txt'
+    _, key = get_bucket_and_key(s3_file)
+    with pytest.raises(UnsupportedData) as excinfo:
+        get_data_type(key)
+    assert "Function supports only csv, json, parquet types." in str(excinfo.value)
 
 @pytest.mark.describe('get_data()')
 @pytest.mark.it('Return correct data')
 @mock_aws
 def test_get_data_return_corect_data():
-    s3_file = 'M3://TESTbucket/some_folder/file.csv'
+    s3_file = 'M3://test_bucket/some_folder/file.csv'
     bucket, key  = get_bucket_and_key(s3_file)
     
     csv_buffer = StringIO()
@@ -53,9 +53,9 @@ def test_get_data_return_corect_data():
     client.put_object(
         Body = csv_data,
         Bucket = bucket,
-        Key = 'some_folder/file.csv')
+        Key = key)
     
-    s3_data = get_data(client, bucket, key).decode()
+    s3_data = get_data(client, 'test_bucket', 'some_folder/file.csv').decode()
     reader = csv.reader(StringIO(s3_data))
     l = [row for row in reader]
     
