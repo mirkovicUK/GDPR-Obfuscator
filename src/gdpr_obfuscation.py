@@ -104,7 +104,7 @@ def obfuscate_csv(data:str, pii_fields:list) -> str:
         :If pii_fields contain fields different than data headers
             function will update data header to represent this
 
-    :param: data (string) representation of csv data
+    :param: data (string) csv data
     :param: pii_fields (list) of the names of the fields that to be obfuscated
     :return: csv file with pii masked
     """
