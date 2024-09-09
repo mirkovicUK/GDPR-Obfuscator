@@ -2,10 +2,13 @@ from src.gdpr_obfuscation import get_bucket_and_key,\
         get_data_type, UnsupportedData, gdpr_obfuscator,\
         get_data, obfuscate_csv, obfuscate_json
 
-from io import StringIO
+from io import StringIO, BytesIO
 from botocore.exceptions import ClientError
 from moto import mock_aws
 import pytest, boto3, csv, json, sys, time
+import pyarrow as pa
+import numpy as np
+import pyarrow.parquet as pq
 
 @pytest.mark.describe('get_bucket_and_key()')
 @pytest.mark.it('Extract correct bucket and key from S3 data location')
@@ -399,3 +402,19 @@ def test_Function_process_1MB_data_in_less_than_1min():
     start_time = time.time()
     gdpr_obfuscator(json.dumps(d))
     assert time.time() - start_time < 60
+
+@pytest.mark.describe('obfuscate_parquet()')
+@pytest.mark.it('Function mask correct fields')
+@mock_aws
+def test_Function_mask_correct_fields():
+    size = 100
+    pydict = {
+        'id' : pa.array(np.arange(size)),
+        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
+        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
+        'country' : pa.array(['test_country' + str(i) for i in range(size)])
+    }
+    table = pa.Table.from_pydict(pydict)
+    pq.write_table(table, parquet_bufer:=BytesIO())
+    print(sys.getsizeof(parquet_bufer))
+    
