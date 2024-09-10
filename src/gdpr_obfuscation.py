@@ -2,6 +2,8 @@ from urllib.parse import urlparse
 from botocore.exceptions import ClientError
 from io import StringIO
 import boto3, csv, json,botocore
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 
 def gdpr_obfuscator(JSON:str) -> bytes:
@@ -146,3 +148,18 @@ def obfuscate_json(data:bytes, pii_fields:list) -> str:
         for y in pii_fields:
             x[y] = '***'
     return json.dumps(data_list)
+
+def obfuscate_parquet(data:bytes, pii_fields:list) -> bytes:
+    table = pq.read_table(pa.BufferReader(data))
+    num_rows = table.num_rows
+    column_names = table.column_names
+    table = table.drop_columns(pii_fields)
+    print(table)
+    for pii_field in pii_fields:
+        table = table.add_column(
+            column_names.index(pii_field),
+            pii_field,
+            [['***' for _ in range(num_rows)]]
+        )
+    print(table) 
+    

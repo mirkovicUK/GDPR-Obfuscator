@@ -1,6 +1,6 @@
 from src.gdpr_obfuscation import get_bucket_and_key,\
         get_data_type, UnsupportedData, gdpr_obfuscator,\
-        get_data, obfuscate_csv, obfuscate_json
+        get_data, obfuscate_csv, obfuscate_json, obfuscate_parquet
 
 from io import StringIO, BytesIO
 from botocore.exceptions import ClientError
@@ -123,7 +123,7 @@ def test_raise_NoSuchBucket_with_wrong_bucket():
 @pytest.mark.describe('obfuscate_csv()')
 @pytest.mark.it('Function mask correct fields')
 @mock_aws
-def test_Mask_correct_fields_and_return_str():
+def test_Function_mask_correct_fields_csv():
     s3_file = 's3://test_bucket/some_folder/file.csv'
     bucket, key  = get_bucket_and_key(s3_file)
     
@@ -174,7 +174,7 @@ def test_Is_Pure_function():
 @pytest.mark.describe('obfuscate_json()')
 @pytest.mark.it('Function mask correct fields')
 @mock_aws
-def test_Function_mask_correct_fields():
+def test_Function_mask_correct_fields_json():
     s3_file = 's3://test_bucket/some_folder/file.json'
     bucket, key  = get_bucket_and_key(s3_file)
     
@@ -406,7 +406,7 @@ def test_Function_process_1MB_data_in_less_than_1min():
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Function mask correct fields')
 @mock_aws
-def test_Function_mask_correct_fields():
+def test_Function_mask_correct_fields_parquet():
     size = 100
     pydict = {
         'id' : pa.array(np.arange(size)),
@@ -416,5 +416,19 @@ def test_Function_mask_correct_fields():
     }
     table = pa.Table.from_pydict(pydict)
     pq.write_table(table, parquet_bufer:=BytesIO())
-    print(sys.getsizeof(parquet_bufer))
     
+    client = boto3.client('s3', region_name="us-east-1")
+    client.create_bucket(Bucket='test_bucket')
+    client.put_object(
+        Body = parquet_bufer.getvalue(),
+        Bucket = 'test_bucket',
+        Key = 'some_folder/file.parquet')
+    
+    s3_data = get_data(client, 'test_bucket', 'some_folder/file.parquet')
+    pii_fields = ['name', 'country']
+    
+    masked_parquet = obfuscate_parquet(s3_data, pii_fields)
+
+    # table = pq.read_table(pa.BufferReader(s3_data))
+    # print(table)
+
