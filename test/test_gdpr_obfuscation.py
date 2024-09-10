@@ -426,9 +426,16 @@ def test_Function_mask_correct_fields_parquet():
     
     s3_data = get_data(client, 'test_bucket', 'some_folder/file.parquet')
     pii_fields = ['name', 'country']
-    
     masked_parquet = obfuscate_parquet(s3_data, pii_fields)
+    masked_table = pq.ParquetFile(BytesIO(masked_parquet)).read()
 
-    # table = pq.read_table(pa.BufferReader(s3_data))
-    # print(table)
+    expected_pydict = {
+        'id' : pa.array(np.arange(size)),
+        'name' : pa.array(['***' for _ in range(size)]),
+        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
+        'country' : pa.array(['***' for _ in range(size)])
+    }
+    expected_table = pa.Table.from_pydict(expected_pydict)
+    
 
+    assert expected_table == masked_table

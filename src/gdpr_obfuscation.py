@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 from botocore.exceptions import ClientError
-from io import StringIO
+from io import StringIO, BytesIO
 import boto3, csv, json,botocore
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -149,17 +149,37 @@ def obfuscate_json(data:bytes, pii_fields:list) -> str:
             x[y] = '***'
     return json.dumps(data_list)
 
-def obfuscate_parquet(data:bytes, pii_fields:list) -> bytes:
+def obfuscate_parquet(data:bytes, pii_fields:list, **kwargs) -> bytes:
+    """
+    Pure function that mask pii_fields in parquet data,
+    function will decompreese parquet file to pyarrow table 
+    remove columns with personally identifiable information (pii_fields)
+    insert new columns keeping column order, with obfuscated strings.
+    Newly created table will than be conwerted to parquet format using
+    PyArrow Parquet engine.
+
+    Default Behaviour for parquete engine as per 
+    pyarrow.parquet.write_table function.
+    Use kwargs to modify default behaviour.
+
+    :param: data (bytes) parquet data
+    :param: pii_fields (list) of the names of the fields to be obfuscated
+    :return: parquet data with pii masked
+    """
     table = pq.read_table(pa.BufferReader(data))
     num_rows = table.num_rows
     column_names = table.column_names
     table = table.drop_columns(pii_fields)
-    print(table)
     for pii_field in pii_fields:
         table = table.add_column(
             column_names.index(pii_field),
             pii_field,
             [['***' for _ in range(num_rows)]]
         )
-    print(table) 
+    pq.write_table(table,parquet_bufer:=BytesIO(), **kwargs)
+    return parquet_bufer.getvalue()
     
+
+
+# metadata = pq.read_metadata(parquet_bufer:=pa.BufferReader(data))
+#     print(json.dumps(metadata.to_dict(),sort_keys=True, indent=2))
