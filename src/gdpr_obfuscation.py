@@ -152,11 +152,9 @@ def obfuscate_json(data:bytes, pii_fields:list) -> str:
 def obfuscate_parquet(data:bytes, pii_fields:list, **kwargs) -> bytes:
     """
     Pure function that mask pii_fields in parquet data,
-    function will decompreese parquet file to pyarrow table 
-    remove columns with personally identifiable information (pii_fields)
-    insert new columns keeping column order, with obfuscated strings.
-    Newly created table will than be conwerted to parquet format using
-    PyArrow Parquet engine.
+    function “delete” columns from a Parquet file by 
+    reading the data into memory, filter out the PII columns,
+    and create a new Parquet file, while keeping column order.
 
     Default Behaviour for parquete engine as per 
     pyarrow.parquet.write_table function.
