@@ -403,6 +403,7 @@ def test_Function_process_1MB_data_in_less_than_1min():
     gdpr_obfuscator(json.dumps(d))
     assert time.time() - start_time < 60
 
+
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Function mask correct fields')
 @mock_aws
@@ -436,6 +437,73 @@ def test_Function_mask_correct_fields_parquet():
         'country' : pa.array(['***' for _ in range(size)])
     }
     expected_table = pa.Table.from_pydict(expected_pydict)
-    
-
     assert expected_table == masked_table
+
+
+@pytest.mark.describe('obfuscate_parquet()')
+@pytest.mark.it('Function keep column order')
+@pytest.mark.parametrize('pii_fields',[
+    ['some_column', 'post_code', 'address', 'country'],
+    ['id', 'name', 'surname', 'country'],
+    ['id', 'name', 'some_column', 'post_code']
+])
+def test_Function_keep_columns_order(pii_fields):
+    size = 100000
+    pydict = {
+        'id' : pa.array(np.arange(size)),
+        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
+        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
+        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
+        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
+        'post_code' : pa.array(['post_code' + str(i) for i in range(size)]),
+        'some_column' : pa.array(['some_column' + str(i) for i in range(size)]),
+    }
+    table = pa.Table.from_pydict(pydict)
+    expected_columns = table.column_names
+    pq.write_table(table, parquet_bufer:=BytesIO())
+    masked_pqfile = obfuscate_parquet(
+        parquet_bufer.getvalue(),
+        pii_fields)
+    
+    masked_table = pq.ParquetFile(BytesIO(masked_pqfile)).read()
+    masked_columns = masked_table.column_names
+    assert masked_columns == expected_columns
+
+@pytest.mark.describe('obfuscate_parquet()')
+@pytest.mark.it('Function handles pii_field that is not in table')
+@pytest.mark.parametrize('wrong_column_name',[
+    ['id', 'name', 'some_column', 'post_code', 'error']
+])
+def test_Function_handles_pii_field_that_is_not_in_table(wrong_column_name):
+    size = 100000
+    pydict = {
+        'id' : pa.array(np.arange(size)),
+        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
+        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
+        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
+        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
+        'post_code' : pa.array(['post_code' + str(i) for i in range(size)]),
+        'some_column' : pa.array(['some_column' + str(i) for i in range(size)]),
+    }
+    table = pa.Table.from_pydict(pydict)
+    expected_columns = table.column_names
+    pq.write_table(table, parquet_bufer:=BytesIO())
+    masked_pqfile = obfuscate_parquet(
+        parquet_bufer.getvalue(),
+        wrong_column_name
+    )
+
+    expected_pydict = {
+        'id' : pa.array(['***' for _ in range(size)]),
+        'name' : pa.array(['***' for _ in range(size)]),
+        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
+        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
+        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
+        'post_code' : pa.array(['***' for _ in range(size)]),
+        'some_column' : pa.array(['***' for _ in range(size)]),
+    }
+    expected_table = pa.Table.from_pydict(expected_pydict)    
+    masked_table = pq.ParquetFile(BytesIO(masked_pqfile)).read()
+    masked_columns = masked_table.column_names
+    assert masked_columns == expected_columns
+    assert masked_table == expected_table

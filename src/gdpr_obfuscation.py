@@ -156,9 +156,13 @@ def obfuscate_parquet(data:bytes, pii_fields:list, **kwargs) -> bytes:
     reading the data into memory, filter out the PII columns,
     and create a new Parquet file, while keeping column order.
 
-    Default Behaviour for parquete engine as per 
-    pyarrow.parquet.write_table function.
-    Use kwargs to modify default behaviour.
+    Default Behaviour:
+        :PyArrow Parquete engine default params as per
+        pyarrow.parquet.write_table function.
+        Use kwargs to modify default behaviour.
+
+        :When detect pii_fild that is not present in table function
+        will log to cloud wach on warning level,and disregard that pii_fild.
 
     :param: data (bytes) parquet data
     :param: pii_fields (list) of the names of the fields to be obfuscated
@@ -167,17 +171,17 @@ def obfuscate_parquet(data:bytes, pii_fields:list, **kwargs) -> bytes:
     table = pq.read_table(pa.BufferReader(data))
     num_rows = table.num_rows
     column_names = table.column_names
-    table = table.drop_columns(pii_fields)
     for pii_field in pii_fields:
-        table = table.add_column(
-            column_names.index(pii_field),
-            pii_field,
-            [['***' for _ in range(num_rows)]]
-        )
+        try:
+            table = table.drop_columns(pii_field)
+            table = table.add_column(
+                column_names.index(pii_field),
+                pii_field,
+                [['***' for _ in range(num_rows)]]
+            )
+        except KeyError:
+            #write loger to cloud watch here
+            pass
     pq.write_table(table,parquet_bufer:=BytesIO(), **kwargs)
     return parquet_bufer.getvalue()
     
-
-
-# metadata = pq.read_metadata(parquet_bufer:=pa.BufferReader(data))
-#     print(json.dumps(metadata.to_dict(),sort_keys=True, indent=2))
