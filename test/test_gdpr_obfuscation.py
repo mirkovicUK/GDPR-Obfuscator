@@ -474,7 +474,6 @@ def test_Function_keep_columns_order(pii_fields):
 @pytest.mark.parametrize('wrong_column_name',[
     ['id', 'name', 'some_column', 'post_code', 'error']
 ])
-
 def test_Function_handles_pii_field_that_is_not_in_table(wrong_column_name):
     size = 100000
     pydict = {
@@ -535,4 +534,24 @@ def test_Is_Pure_Function(pii_fields, expected):
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Function applys correct compression algorithms')
 def test_Function_applys_correct_compression_algorithms():
-    print('test')
+    size = 100000
+    pydict = {
+        'id' : pa.array(np.arange(size)),
+        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
+        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
+        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
+        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
+        'post_code' : pa.array(['post_code' + str(i) for i in range(size)]),
+        'some_column' : pa.array(['some_column' + str(i) for i in range(size)]),
+    }
+    table = pa.Table.from_pydict(pydict)
+    pq.write_table(table, parquet_buffer:=BytesIO())
+    masked_pqfile = obfuscate_parquet(
+        parquet_buffer.getvalue(),
+        ['name'],
+        compression='GZIP'
+    )
+    metadata = pq.read_metadata(BytesIO(masked_pqfile))
+    metadata_dict = metadata.to_dict()
+    compression = metadata_dict['row_groups'][0]['columns'][0]['compression']
+    assert compression == 'GZIP'
