@@ -516,7 +516,6 @@ def test_Function_handles_pii_field_that_is_not_in_table(wrong_column_name):
     ['id', 'name', 'some_column', 'address'],
     ['id', 'name', 'some_column', 'address']
 )])
-
 def test_Is_Pure_Function(pii_fields, expected):
     size = 100000
     pydict = {
@@ -533,3 +532,7 @@ def test_Is_Pure_Function(pii_fields, expected):
     obfuscate_parquet(parquet_buffer.getvalue(), pii_fields)
     assert pii_fields == expected
 
+@pytest.mark.describe('obfuscate_parquet()')
+@pytest.mark.it('Function applys correct compression algorithms')
+def test_Function_applys_correct_compression_algorithms():
+    print('test')
