@@ -532,8 +532,8 @@ def test_Is_Pure_Function(pii_fields, expected):
     assert pii_fields == expected
 
 @pytest.mark.describe('obfuscate_parquet()')
-@pytest.mark.it('Function applys correct compression algorithms')
-def test_Function_applys_correct_compression_algorithms():
+@pytest.mark.it('Function applies correct compression algorithms')
+def test_Function_applies_correct_compression_algorithms():
     size = 100000
     pydict = {
         'id' : pa.array(np.arange(size)),
