@@ -192,15 +192,16 @@ def setup_logger():
     Function create logger that output to stdout and gdpr_obfuscator.log file
     """
     file_handler = logging.FileHandler(filename='gdpr_obfuscator.log')
-    formatter = logging.Formatter('[%(asctime)s] \
-        %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s',\
-        datefmt='%a, %d %b %Y %H:%M:%S')
+    formatter = logging.Formatter(
+        '[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s'
+        ,datefmt='%a, %d %b %Y %H:%M:%S')
     file_handler.setFormatter(formatter)
 
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
-    stdout_handler.setFormatter(colorlog.ColoredFormatter('%(log_color)s [%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s', datefmt='%a, %d %b %Y %H:%M:%S'))
+    stdout_handler.setFormatter(colorlog.ColoredFormatter(
+        '%(log_color)s [%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s: %(lineno)d] %(message)s',
+        datefmt='%a, %d %b %Y %H:%M:%S'))
     handlers = [file_handler, stdout_handler]
-
     logging.basicConfig(
         level=logging.DEBUG,
         handlers=handlers
