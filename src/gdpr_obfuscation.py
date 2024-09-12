@@ -203,11 +203,11 @@ def setup_logger():
         datefmt='%a, %d %b %Y %H:%M:%S'))
     handlers = [file_handler, stdout_handler]
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.WARNING,
         handlers=handlers
     )
 
 
 
-# if __name__ == "__main__":
-#     gdpr_obfuscator(json.dumps({'file_to_obfuscate':'s', 'l':[]}))
+if __name__ == "__main__":
+    gdpr_obfuscator(json.dumps({'file_to_obfuscate':'s', 'l':[]}))
