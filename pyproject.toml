@@ -2,7 +2,7 @@
 name = "GDPR_Obfuscator"
 version = "2024.0.0"
 readme = "README.md"
-dependencies = ["boto3", "pyarrow"]
+dependencies = ["boto3", "pyarrow", "colorlog"]
 
 [build-system]
 requires = ["setuptools >= 61.0"]
