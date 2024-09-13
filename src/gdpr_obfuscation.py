@@ -4,7 +4,7 @@ from io import StringIO, BytesIO
 import boto3, csv, json,botocore, sys
 import pyarrow as pa
 import pyarrow.parquet as pq
-import logging, colorlog
+import logging
 
 
 def gdpr_obfuscator(JSON:str) -> bytes:
@@ -33,6 +33,9 @@ def gdpr_obfuscator(JSON:str) -> bytes:
     :return: bytestream representation of a file with obfuscated data fields
     """
     setup_logger() if not logging.getLogger().hasHandlers() else None
+
+    logger = logging.getLogger()
+    logger.warning('TEST TEST')
     pydict = json.loads(JSON)
     bucket, key = get_bucket_and_key(pydict['file_to_obfuscate'])
     data_type = get_data_type(key)
@@ -193,14 +196,16 @@ def setup_logger():
     """
     file_handler = logging.FileHandler(filename='gdpr_obfuscator.log')
     formatter = logging.Formatter(
-        '[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s'
-        ,datefmt='%a, %d %b %Y %H:%M:%S')
+        '[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s',
+        datefmt='%a, %d %b %Y %H:%M:%S')
     file_handler.setFormatter(formatter)
 
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
-    stdout_handler.setFormatter(colorlog.ColoredFormatter(
-        '%(log_color)s [%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s: %(lineno)d] %(message)s',
-        datefmt='%a, %d %b %Y %H:%M:%S'))
+    formatter = logging.Formatter(
+        '[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s: %(lineno)d] %(message)s',
+        datefmt='%a, %d %b %Y %H:%M:%S')
+    
+    stdout_handler.setFormatter(formatter)
     handlers = [file_handler, stdout_handler]
     logging.basicConfig(
         level=logging.WARNING,
