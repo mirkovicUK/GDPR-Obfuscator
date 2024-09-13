@@ -214,7 +214,7 @@ def test_Is_pure_function():
     pii_fields = ['name', 'country']
     obfuscate_json(b'', pii_fields)
     assert pii_fields == ['name', 'country']
-    
+
 ########################################################################
 @pytest.mark.describe('gdpr_obfuscator()')
 @pytest.mark.it('Return data with correct pii_fields masked csv data')
@@ -329,8 +329,6 @@ def test_Function_outputis_compatible_with_the_boto3_S3_Put_Object(csv_data):
 
     assert response['ResponseMetadata']['HTTPStatusCode'] == 200
 
-################################################################################
-
 @pytest.mark.describe('gdpr_obfuscator()')
 @pytest.mark.it('Function process 1MB data in less than 1min')
 @mock_aws
@@ -362,7 +360,7 @@ def test_Function_process_1MB_data_in_less_than_1min():
     start_time = time.time()
     gdpr_obfuscator(json.dumps(d))
     assert time.time() - start_time < 60
-
+#####################################################################################
 
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Function mask correct fields')
