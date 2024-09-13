@@ -8,6 +8,7 @@ import logging
 try:
     import colorlog
 except ModuleNotFoundError:
+    logging.getLogger().info('pip install colorlog for log formatred with colors')
     pass
 
 
@@ -37,9 +38,6 @@ def gdpr_obfuscator(JSON:str) -> bytes:
     :return: bytestream representation of a file with obfuscated data fields
     """
     setup_logger() if not logging.getLogger().hasHandlers() else None
-
-    logger = logging.getLogger(__name__)
-    logger.critical('RAISING ERROR')
     pydict = json.loads(JSON)
     bucket, key = get_bucket_and_key(pydict['file_to_obfuscate'])
     data_type = get_data_type(key)
@@ -211,7 +209,6 @@ def setup_logger():
             '%(log_color)s [%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s: %(lineno)d] %(message)s',
             datefmt='%a, %d %b %Y %H:%M:%S'))
     except NameError:
-        raise(BaseException('IMPORT COLORLOG is in try, check this try'))
         formatter = logging.Formatter(
         '[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s: %(lineno)d] %(message)s',
         datefmt='%a, %d %b %Y %H:%M:%S')

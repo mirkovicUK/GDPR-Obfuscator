@@ -1,11 +1,12 @@
 from src.gdpr_obfuscation import get_bucket_and_key,\
         get_data_type, UnsupportedData, gdpr_obfuscator,\
-        get_data, obfuscate_csv, obfuscate_json, obfuscate_parquet
+        get_data, obfuscate_csv, obfuscate_json,\
+        obfuscate_parquet, setup_logger
 
 from io import StringIO, BytesIO
 from botocore.exceptions import ClientError
 from moto import mock_aws
-import pytest, boto3, csv, json, sys, time
+import pytest, boto3, csv, json, sys, time, logging
 import pyarrow as pa
 import numpy as np
 import pyarrow.parquet as pq
@@ -556,3 +557,20 @@ def test_Function_applies_correct_compression_algorithms():
     compression = metadata_dict['row_groups'][0]['columns'][0]['compression']
     assert compression == 'GZIP'
 
+@pytest.mark.describe('setup_logger()')
+@pytest.mark.it('Function setup correct_loggin_handlers')
+def test_setup_logger_sets_correct_loggin_handlers():
+    logging.getLogger().handlers.clear()
+    setup_logger()
+    handlers = logging.getLogger().handlers
+    stream_handler = handlers[1]
+    file_handler = handlers[0]
+    assert len(handlers) == 2
+    assert issubclass(logging.FileHandler, logging.StreamHandler)
+    assert isinstance(stream_handler, logging.StreamHandler)
+    assert not isinstance(stream_handler, logging.FileHandler)
+    assert isinstance(
+        file_handler,
+        (logging.FileHandler,logging.StreamHandler)
+    )
+   
