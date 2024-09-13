@@ -38,15 +38,20 @@ def gdpr_obfuscator(JSON:str) -> bytes:
     :return: bytestream representation of a file with obfuscated data fields
     """
     setup_logger() if not logging.getLogger().hasHandlers() else None
+
     pydict = json.loads(JSON)
     bucket, key = get_bucket_and_key(pydict['file_to_obfuscate'])
     data_type = get_data_type(key)
     s3 = boto3.client('s3')
     data:bytes = get_data(s3, bucket, key)
+
     if data_type == 'csv':
         masked = obfuscate_csv(data.decode(), pydict['pii_fields']).encode()
     elif data_type == 'json':
         masked = obfuscate_json(data, pydict['pii_fields']).encode()
+    elif data_type == 'parquet':
+        masked = obfuscate_parquet(data, pydict['pii_fields'])
+        
     return masked
 
 def get_bucket_and_key(s3_file_path:str) -> tuple[str, str]:
