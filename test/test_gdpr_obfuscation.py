@@ -38,6 +38,7 @@ def csv_data():
 
     return csv_buffer.getvalue(), expected_csv_buffer.getvalue()
 
+
 @pytest.fixture
 def json_data():
     """
@@ -59,6 +60,39 @@ def json_data():
     ]).encode()
 
     return json.dumps(json_data), expected_json_data
+
+@pytest.fixture
+def parquet_data():
+    """
+    :return: (tuple) parquet_data structured for boto3 put_object(),
+        and expected_parquet_data for assertion
+    """
+    size = 100000
+    pydict = {
+        'id' : pa.array(np.arange(size)),
+        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
+        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
+        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
+        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
+        'post_code' : pa.array(['post_code' + str(i) for i in range(size)]),
+        'some_column' : pa.array(['some_column' + str(i) for i in range(size)]),
+    }
+    table = pa.Table.from_pydict(pydict)
+    pq.write_table(table, parquet_buffer:=BytesIO())
+
+    expected_pydict = {
+        'id' : pa.array(['***' for _ in range(size)]),
+        'name' : pa.array(['***' for _ in range(size)]),
+        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
+        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
+        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
+        'post_code' : pa.array(['***' for _ in range(size)]),
+        'some_column' : pa.array(['***' for _ in range(size)]),
+    }
+    expected_table = pa.Table.from_pydict(expected_pydict)
+    pq.write_table(expected_table, expected_parquet_buffer:=BytesIO())
+
+    return parquet_buffer.getvalue(), expected_parquet_buffer.getvalue()
 ######################################################################################
 #                 *FIXTURE END*
 ######################################################################################
@@ -71,6 +105,7 @@ def test_extract_correct_bucket_and_key_from_S3_location():
     assert bucket == 'my_bucket'
     assert key == 'some_folder/file.txt'
 
+
 @pytest.mark.describe('get_data_type()')
 @pytest.mark.it('Extract correct data type')
 def test_extract_correct_data_type():
@@ -78,6 +113,7 @@ def test_extract_correct_data_type():
     _, key = get_bucket_and_key(s3_file)
     data_type = get_data_type(key)
     assert data_type == 'csv'
+
 
 @pytest.mark.describe('get_data_type()')
 @pytest.mark.it('Raise UnsupportedData exeption')
@@ -87,6 +123,7 @@ def test_raise_UnsuporetedData():
     with pytest.raises(UnsupportedData) as excinfo:
         get_data_type(key)
     assert "Function supports only csv, json, parquet types." in str(excinfo.value)
+
 
 @pytest.mark.describe('get_data()')
 @pytest.mark.it('Return correct data')
@@ -112,6 +149,7 @@ def test_get_data_return_corect_data(csv_data):
                     ['2','test_name2', 'test_surname2', 'test_country2']]
     assert s3_data == csv_data_s3
 
+
 @pytest.mark.describe('get_data()')
 @pytest.mark.it('Raise NoSuchKey with wrong key')
 @mock_aws
@@ -132,6 +170,7 @@ def test_raise_NoSuchKey_with_wrong_key(csv_data):
         get_data(client, bucket, 'wrong_key')
     assert 'NoSuchKey' in str(excinfo.value)
 
+
 @pytest.mark.describe('get_data()')
 @pytest.mark.it('Raise NoSuchBacket with wrong buket')
 @mock_aws
@@ -150,6 +189,7 @@ def test_raise_NoSuchBucket_with_wrong_bucket(csv_data):
     with pytest.raises(ClientError) as excinfo:
         get_data(client, 'WRONG_BUCKET', key)
     assert 'NoSuchBucket' in str(excinfo.value)
+
 
 @pytest.mark.describe('obfuscate_csv()')
 @pytest.mark.it('Function mask correct fields')
@@ -172,6 +212,7 @@ def test_Function_mask_correct_fields_csv(csv_data):
     
     assert masked_csv == expected_csv_data
 
+
 @pytest.mark.describe('obfuscate_csv()')
 @pytest.mark.it('Is Pure function')
 def test_Is_Pure_function(csv_data):
@@ -180,6 +221,7 @@ def test_Is_Pure_function(csv_data):
     obfuscate_csv(csv_data, pii_fields)
 
     assert pii_fields == ['name', 'country']
+
 
 @pytest.mark.describe('obfuscate_json()')
 @pytest.mark.it('Function mask correct fields')
@@ -201,12 +243,14 @@ def test_Function_mask_correct_fields_json(json_data):
     masked_data = obfuscate_json(s3_data, pii_fields).encode()
     assert expected_json_data == masked_data
     
+
 @pytest.mark.describe('obfuscate_json()')
 @pytest.mark.it('Return empty serilized list when data oject is empty')
 def test_Return_empty_serilized_list_when_encount_empty_data_obj():  
     pii_fields = ['name', 'country']
     masked_data = obfuscate_json(b'', pii_fields)
     assert json.dumps([]) == masked_data
+
 
 @pytest.mark.describe('obfuscate_json()')
 @pytest.mark.it('Is pure function')
@@ -215,7 +259,10 @@ def test_Is_pure_function():
     obfuscate_json(b'', pii_fields)
     assert pii_fields == ['name', 'country']
 
+
 ########################################################################
+# gdpr_obsfucator() tests
+#######################################################################
 @pytest.mark.describe('gdpr_obfuscator()')
 @pytest.mark.it('Return data with correct pii_fields masked csv data')
 @mock_aws
@@ -360,42 +407,20 @@ def test_Function_process_1MB_data_in_less_than_1min():
     start_time = time.time()
     gdpr_obfuscator(json.dumps(d))
     assert time.time() - start_time < 60
-#####################################################################################
+
+####################################################################################
+# obsfuscate_parquet() tests
+###################################################################################
 
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Function mask correct fields')
-@mock_aws
-def test_Function_mask_correct_fields_parquet():
-    size = 100
-    pydict = {
-        'id' : pa.array(np.arange(size)),
-        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
-        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
-        'country' : pa.array(['test_country' + str(i) for i in range(size)])
-    }
-    table = pa.Table.from_pydict(pydict)
-    pq.write_table(table, parquet_buffer:=BytesIO())
-    
-    client = boto3.client('s3', region_name="us-east-1")
-    client.create_bucket(Bucket='test_bucket')
-    client.put_object(
-        Body = parquet_buffer.getvalue(),
-        Bucket = 'test_bucket',
-        Key = 'some_folder/file.parquet')
-    
-    s3_data = get_data(client, 'test_bucket', 'some_folder/file.parquet')
-    pii_fields = ['name', 'country']
-    masked_parquet = obfuscate_parquet(s3_data, pii_fields)
-    masked_table = pq.ParquetFile(BytesIO(masked_parquet)).read()
+def test_Function_mask_correct_fields_parquet(parquet_data):
+    parquet_data, expected_parquet_data = parquet_data
+    pii_fields = ['id', 'name', 'post_code', 'some_column']
+    masked_parquet = obfuscate_parquet(parquet_data, pii_fields)
 
-    expected_pydict = {
-        'id' : pa.array(np.arange(size)),
-        'name' : pa.array(['***' for _ in range(size)]),
-        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
-        'country' : pa.array(['***' for _ in range(size)])
-    }
-    expected_table = pa.Table.from_pydict(expected_pydict)
-    assert expected_table == masked_table
+    assert expected_parquet_data == masked_parquet
+
 
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Function keep column order')
@@ -405,68 +430,36 @@ def test_Function_mask_correct_fields_parquet():
     ['id', 'name', 'some_column', 'post_code'],
     ['id', 'name', 'some_column', 'post_code', 'country']
 ])
-
-def test_Function_keep_columns_order(pii_fields):
-    size = 100000
-    pydict = {
-        'id' : pa.array(np.arange(size)),
-        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
-        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
-        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
-        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
-        'post_code' : pa.array(['post_code' + str(i) for i in range(size)]),
-        'some_column' : pa.array(['some_column' + str(i) for i in range(size)]),
-    }
-    table = pa.Table.from_pydict(pydict)
-    expected_columns = table.column_names
-    pq.write_table(table, parquet_buffer:=BytesIO())
+def test_Function_keep_columns_order(pii_fields, parquet_data):
+    parquet_data, _ = parquet_data
+    expected_columns = [
+        'id', 'name', 'surname', 'country', 'address', 'post_code', 'some_column']
     masked_pqfile = obfuscate_parquet(
-        parquet_buffer.getvalue(),
+        parquet_data,
         pii_fields)
     
     masked_table = pq.ParquetFile(BytesIO(masked_pqfile)).read()
     masked_columns = masked_table.column_names
     assert masked_columns == expected_columns
 
+
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Function handles pii_field that is not in table')
 @pytest.mark.parametrize('wrong_column_name',[
-    ['id', 'name', 'some_column', 'post_code', 'error']
-])
-def test_Function_handles_pii_field_that_is_not_in_table(wrong_column_name):
-    size = 100000
-    pydict = {
-        'id' : pa.array(np.arange(size)),
-        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
-        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
-        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
-        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
-        'post_code' : pa.array(['post_code' + str(i) for i in range(size)]),
-        'some_column' : pa.array(['some_column' + str(i) for i in range(size)]),
-    }
-    table = pa.Table.from_pydict(pydict)
-    pq.write_table(table, parquet_buffer:=BytesIO())
+    ['id', 'name', 'some_column', 'post_code', 'error']])
+def test_Function_handles_pii_field_that_is_not_in_table(wrong_column_name, parquet_data):
+    parquet_data, expected_parquet_data = parquet_data
     masked_pqfile = obfuscate_parquet(
-        parquet_buffer.getvalue(),
+        parquet_data,
         wrong_column_name
     )
     masked_table = pq.ParquetFile(BytesIO(masked_pqfile)).read()
     masked_columns = masked_table.column_names
 
-    expected_pydict = {
-        'id' : pa.array(['***' for _ in range(size)]),
-        'name' : pa.array(['***' for _ in range(size)]),
-        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
-        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
-        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
-        'post_code' : pa.array(['***' for _ in range(size)]),
-        'some_column' : pa.array(['***' for _ in range(size)]),
-    }
-    expected_table = pa.Table.from_pydict(expected_pydict)
-    expected_columns = expected_table.column_names
-    
+    expected_columns = [
+        'id', 'name', 'surname', 'country', 'address', 'post_code', 'some_column']
     assert masked_columns == expected_columns
-    assert masked_table == expected_table
+    assert masked_table == pq.ParquetFile(BytesIO(expected_parquet_data)).read()
 
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Is Pure function')
@@ -474,39 +467,17 @@ def test_Function_handles_pii_field_that_is_not_in_table(wrong_column_name):
     ['id', 'name', 'some_column', 'address'],
     ['id', 'name', 'some_column', 'address']
 )])
-def test_Is_Pure_Function(pii_fields, expected):
-    size = 100000
-    pydict = {
-        'id' : pa.array(np.arange(size)),
-        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
-        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
-        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
-        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
-        'post_code' : pa.array(['post_code' + str(i) for i in range(size)]),
-        'some_column' : pa.array(['some_column' + str(i) for i in range(size)]),
-    }
-    table = pa.Table.from_pydict(pydict)
-    pq.write_table(table, parquet_buffer:=BytesIO())
-    obfuscate_parquet(parquet_buffer.getvalue(), pii_fields)
+def test_Is_Pure_Function(pii_fields, expected, parquet_data):
+    parquet_data, _ = parquet_data
+    obfuscate_parquet(parquet_data, pii_fields)
     assert pii_fields == expected
 
 @pytest.mark.describe('obfuscate_parquet()')
 @pytest.mark.it('Function applies correct compression algorithms')
-def test_Function_applies_correct_compression_algorithms():
-    size = 100000
-    pydict = {
-        'id' : pa.array(np.arange(size)),
-        'name' : pa.array(['test_name' + str(i) for i in range(size)]),
-        'surname' : pa.array(['test_surname' + str(i) for i in range(size)]),
-        'country' : pa.array(['test_country' + str(i) for i in range(size)]),
-        'address' : pa.array(['test_address' + str(i) for i in range(size)]),
-        'post_code' : pa.array(['post_code' + str(i) for i in range(size)]),
-        'some_column' : pa.array(['some_column' + str(i) for i in range(size)]),
-    }
-    table = pa.Table.from_pydict(pydict)
-    pq.write_table(table, parquet_buffer:=BytesIO())
+def test_Function_applies_correct_compression_algorithms(parquet_data):
+    parquet_data, _ = parquet_data
     masked_pqfile = obfuscate_parquet(
-        parquet_buffer.getvalue(),
+        parquet_data,
         ['name'],
         compression='GZIP'
     )
@@ -514,7 +485,9 @@ def test_Function_applies_correct_compression_algorithms():
     metadata_dict = metadata.to_dict()
     compression = metadata_dict['row_groups'][0]['columns'][0]['compression']
     assert compression == 'GZIP'
-
+#####################################################################################
+#   *END*  obsfuscate_parquet() tests
+####################################################################################
 @pytest.mark.describe('setup_logger()')
 @pytest.mark.it('Function setup correct_loggin_handlers')
 def test_setup_logger_sets_correct_loggin_handlers():
