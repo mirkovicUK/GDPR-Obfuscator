@@ -12,7 +12,7 @@ except ModuleNotFoundError:
     pass
 
 
-def gdpr_obfuscator(JSON:str) -> bytes:
+def gdpr_obfuscator(JSON:str, **kwargs) -> bytes:
     """
     Retrieve data ingested to AWS S3 and
     intercept personally identifiable information (PII).
@@ -42,6 +42,7 @@ def gdpr_obfuscator(JSON:str) -> bytes:
     pydict = json.loads(JSON)
     bucket, key = get_bucket_and_key(pydict['file_to_obfuscate'])
     data_type = get_data_type(key)
+    
     s3 = boto3.client('s3')
     data:bytes = get_data(s3, bucket, key)
 
@@ -94,6 +95,8 @@ def get_data(client:botocore.client, bucket:str, key:str) -> bytes:
     :param: key (string) s3 data key 
     :return: bytestream representation of a data
     """
+    logger = logging.getLogger(__name__)
+    logger.setLevel('CRITICAL')
     try:
         response = client.get_object(
         Bucket = bucket,
@@ -101,12 +104,10 @@ def get_data(client:botocore.client, bucket:str, key:str) -> bytes:
         return response['Body'].read()
     except ClientError as error:
         if error.response['Error']['Code'] == 'NoSuchKey':
-            # Confirm expected required behaviour
-            # log to cloud watch?
+            logger.critical('NoSuchKey')
             pass
         elif error.response['Error']['Code'] == 'NoSuchBucket':
-            # Confirm expected required behaviour
-            # log to cloud watch?
+            logger.critical('NoSuchBucket')
             pass
         raise
 
@@ -180,6 +181,8 @@ def obfuscate_parquet(data:bytes, pii_fields:list, **kwargs) -> bytes:
     :param: pii_fields (list) of the names of the fields to be obfuscated
     :return: parquet data with pii masked
     """
+    logger = logging.getLogger('obfuscate_parquet()')
+    logger.setLevel('WARNING')
     table = pq.read_table(pa.BufferReader(data))
     num_rows = table.num_rows
     column_names = table.column_names
@@ -192,7 +195,9 @@ def obfuscate_parquet(data:bytes, pii_fields:list, **kwargs) -> bytes:
                 [['***' for _ in range(num_rows)]]
             )
         except KeyError:
-            #write loger to cloud watch here
+            logger.warning(
+                f'WARNING pii_field:\'{pii_field}\' not in data ... skipping ...'
+            )
             pass
     pq.write_table(table,parquet_bufer:=BytesIO(), **kwargs)
     return parquet_bufer.getvalue()
