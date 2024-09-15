@@ -12,7 +12,7 @@ except ModuleNotFoundError:
     pass
 
 
-def gdpr_obfuscator(JSON:str, **kwargs) -> bytes:
+def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
     """
     Retrieve data ingested to AWS S3 and
     intercept personally identifiable information (PII).
@@ -43,7 +43,7 @@ def gdpr_obfuscator(JSON:str, **kwargs) -> bytes:
     bucket, key = get_bucket_and_key(pydict['file_to_obfuscate'])
     data_type = get_data_type(key)
     
-    s3 = boto3.client('s3')
+    s3 = boto3.client('s3', **boto_kw)
     data:bytes = get_data(s3, bucket, key)
 
     if data_type == 'csv':
@@ -51,7 +51,7 @@ def gdpr_obfuscator(JSON:str, **kwargs) -> bytes:
     elif data_type == 'json':
         masked = obfuscate_json(data, pydict['pii_fields']).encode()
     elif data_type == 'parquet':
-        masked = obfuscate_parquet(data, pydict['pii_fields'])
+        masked = obfuscate_parquet(data, pydict['pii_fields'], **pq_kw)
         
     return masked
 
