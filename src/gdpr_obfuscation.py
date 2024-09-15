@@ -35,10 +35,10 @@ def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
         "pii_fields": ["name", "email_address"]
     }
 
-    :pq_kw: (dictionary) Use this variable to pass arguments to boto client
+    :boto_kw: (dictionary) Use this variable to pass arguments to boto client
         for example: boto_kw = {'aws_access_key_id' : 'Your account access key', ...}
 
-    :boto_kw: (dictionary) Use this variable to pass arguments to
+    :pq_kw: (dictionary) Use this variable to pass arguments to
         pyarrow.parquet write_table function
         for example: boto_kw = {'compression' : 'GZIP', ...}
     
