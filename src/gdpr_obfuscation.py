@@ -20,7 +20,7 @@ def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
     copy of the input file but with the sensitive
     data replaced with obfuscated strings.
 
-    Exepts csv, json or parquet data file format
+    Exept csv, json or parquet data file format
         JSON data format = [{data1}, {data2}...]
     
     :param: JSON (string) containing:
@@ -35,6 +35,13 @@ def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
         "pii_fields": ["name", "email_address"]
     }
 
+    :pq_kw: (dictionary) Use this variable to pass arguments to boto client
+        for example: boto_kw = {'aws_access_key_id' : 'Your account access key', ...}
+
+    :boto_kw: (dictionary) Use this variable to pass arguments to
+        pyarrow.parquet write_table function
+        for example: boto_kw = {'compression' : 'GZIP', ...}
+    
     :return: bytestream representation of a file with obfuscated data fields
     """
     setup_logger() if not logging.getLogger().hasHandlers() else None
