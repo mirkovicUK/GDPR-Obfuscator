@@ -211,7 +211,8 @@ def obfuscate_parquet(data:bytes, pii_fields:list, **kwargs) -> bytes:
     
 def setup_logger():
     """
-    Function create logger that output to stdout and gdpr_obfuscator.log file
+    Function to setup logger: FileHandler and StreamHandler
+    log file: gdpr_obfuscator.log file
     logging level WARNING
     """
     file_handler = logging.FileHandler(filename='gdpr_obfuscator.log')
