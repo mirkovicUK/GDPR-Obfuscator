@@ -40,7 +40,7 @@ def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
 
     :pq_kw: (dictionary) Use this variable to pass arguments to
         pyarrow.parquet write_table function
-        for example: boto_kw = {'compression' : 'GZIP', ...}
+        for example: pq_kw = {'compression' : 'GZIP', ...}
     
     :return: bytestream representation of a file with obfuscated data fields
     """

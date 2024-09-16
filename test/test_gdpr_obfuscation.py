@@ -18,7 +18,7 @@ import pyarrow.parquet as pq
 def csv_data():
     """
     :returns: (tuple) csv data structured for boto3 put_object(),
-        and expected csv data for assertion
+        and expected csv data for assertion masking ['name', 'country']
     """
     csv_buffer = StringIO()
     headers = ['id','name', 'surname', 'country']
@@ -43,7 +43,8 @@ def csv_data():
 def json_data():
     """
     returns: (tuple) json data structured for boto3 put_object(),
-        and expected json data for assertion after masking pii fields
+        and expected json data for assertion after masking 
+        pii fields ['name', 'country']
     """
     json_data = []
     for i in range(2):
@@ -65,7 +66,8 @@ def json_data():
 def parquet_data():
     """
     :return: (tuple) parquet_data structured for boto3 put_object(),
-        and expected_parquet_data for assertion after masking pii fields
+        and expected_parquet_data for assertion after masking 
+        pii fields ['id', 'name', 'post_code', 'some_column']
     """
     size = 100000
     pydict = {
@@ -445,12 +447,12 @@ def test_Function_outputis_compatible_with_the_boto3_S3_Put_Object(csv_json_parq
         d = {}
         d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields
         response = client.put_object(
-        Body = gdpr_obfuscator(json.dumps(d)),
-        Bucket = 'test_bucket',
-        Key = 'Masked_TEST_data.csv')
+            Body = gdpr_obfuscator(json.dumps(d)),
+            Bucket = 'test_bucket',
+            Key = f'Masked_TEST_data.{key}')
         responses.append(response['ResponseMetadata']['HTTPStatusCode'] == 200)
     
-    assert len(responses) > 0 and all(responses)
+    assert len(responses) == 3 and all(responses)
 
 
 @pytest.mark.describe('gdpr_obfuscator()')
@@ -589,22 +591,22 @@ def test_setup_logger_sets_correct_loggin_handlers():
 @pytest.mark.describe('gdpr_obfuscator')
 @pytest.mark.it('Function passing correct kwargs to boto3.client')
 @mock_aws
-def test_Function_passing_correct_kwargs_to_boto3_client(csv_data):
-    csv_data_s3, _ = csv_data
+def test_Function_passing_correct_kwargs_to_boto3_client(parquet_data):
+    parquet_data, _ = parquet_data
 
     client = boto3.client('s3', region_name="us-east-1")
     client.create_bucket(Bucket='test_bucket')
     client.put_object(
-        Body = csv_data_s3,
+        Body = parquet_data,
         Bucket = 'test_bucket',
-        Key = 'some_folder/file.csv')
+        Key = 'some_folder/file.parquet')
     
     s3_file = 's3://test_bucket/some_folder/file.parquet'
     pii_fields = ['name', 'country']
     d = {}
     d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields
     json_str = json.dumps(d)
-    gdpr_obfuscator(json_str, boto_kw={'5':'3'})
+    gdpr_obfuscator(json_str, pq_kw = {'compression' : 'GZIP'})
     ###
     #test not compleated
     ###
