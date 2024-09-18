@@ -5,11 +5,6 @@ import boto3, csv, json,botocore, sys
 import pyarrow as pa
 import pyarrow.parquet as pq
 import logging
-try:
-    import colorlog
-except ModuleNotFoundError:
-    logging.getLogger().info('pip install colorlog for log formatred with colors')
-    pass
 
 
 def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
@@ -188,7 +183,7 @@ def obfuscate_parquet(data:bytes, pii_fields:list, **kwargs) -> bytes:
     :param: pii_fields (list) of the names of the fields to be obfuscated
     :return: parquet data with pii masked
     """
-    logger = logging.getLogger('obfuscate_parquet()')
+    logger = logging.getLogger(__name__)
     logger.setLevel('WARNING')
     table = pq.read_table(pa.BufferReader(data))
     num_rows = table.num_rows
@@ -222,15 +217,10 @@ def setup_logger():
     file_handler.setFormatter(formatter)
 
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
-    try:
-        stdout_handler.setFormatter(colorlog.ColoredFormatter(
-            '%(log_color)s [%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s: %(lineno)d] %(message)s',
-            datefmt='%a, %d %b %Y %H:%M:%S'))
-    except NameError:
-        formatter = logging.Formatter(
+    formatter = logging.Formatter(
         '[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s: %(lineno)d] %(message)s',
         datefmt='%a, %d %b %Y %H:%M:%S')
-        stdout_handler.setFormatter(formatter)
+    stdout_handler.setFormatter(formatter)
 
     handlers = [file_handler, stdout_handler]
     logging.basicConfig(
@@ -241,4 +231,4 @@ def setup_logger():
 
 
 if __name__ == "__main__":
-    gdpr_obfuscator(json.dumps({'file_to_obfuscate':'s', 'l':[]}))
+    gdpr_obfuscator(json.dumps({'file_to_obfuscate':'s.csv', 'l':[]}))

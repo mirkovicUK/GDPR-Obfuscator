@@ -588,27 +588,5 @@ def test_setup_logger_sets_correct_loggin_handlers():
     )
 
 
-@pytest.mark.describe('gdpr_obfuscator')
-@pytest.mark.it('Function passing correct kwargs to boto3.client')
-@mock_aws
-def test_Function_passing_correct_kwargs_to_boto3_client(parquet_data):
-    parquet_data, _ = parquet_data
 
-    client = boto3.client('s3', region_name="us-east-1")
-    client.create_bucket(Bucket='test_bucket')
-    client.put_object(
-        Body = parquet_data,
-        Bucket = 'test_bucket',
-        Key = 'some_folder/file.parquet')
-    
-    s3_file = 's3://test_bucket/some_folder/file.parquet'
-    pii_fields = ['name', 'country']
-    d = {}
-    d['file_to_obfuscate'], d['pii_fields'] = s3_file, pii_fields
-    json_str = json.dumps(d)
-    gdpr_obfuscator(json_str, pq_kw = {'compression' : 'GZIP'})
-    ###
-    #test not compleated
-    ###
-    assert False
    
