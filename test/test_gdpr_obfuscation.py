@@ -235,6 +235,15 @@ def test_Function_mask_correct_fields_csv(csv_data):
 
 
 @pytest.mark.describe('obfuscate_csv()')
+@pytest.mark.it('Function returns_empty_str_when_no_data_is_passed')
+@mock_aws
+def test_Function_returns_empty_str_when_no_data_is_passed():
+    masked_csv = obfuscate_csv('', ['some_field'])
+    
+    assert masked_csv == ''
+
+
+@pytest.mark.describe('obfuscate_csv()')
 @pytest.mark.it('Is Pure function')
 def test_Is_Pure_function(csv_data):
     csv_data, _ = csv_data  

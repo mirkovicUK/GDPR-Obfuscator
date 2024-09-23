@@ -126,7 +126,7 @@ def obfuscate_csv(data:str, pii_fields:list) -> str:
     try:
         headers = list(masked[0].keys())
     except IndexError:
-        headers = []
+        return str()
     
     masked_bufer = StringIO()
     writer = csv.DictWriter(masked_bufer, headers)
@@ -219,8 +219,3 @@ def setup_logger():
         level=logging.WARNING,
         handlers=handlers
     )
-
-
-
-if __name__ == "__main__":
-    gdpr_obfuscator(json.dumps({'file_to_obfuscate':'s.csv', 'l':[]}))

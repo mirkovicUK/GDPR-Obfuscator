@@ -49,3 +49,6 @@ venv.bak/
 
 #Logs
 gdpr_obfuscator.log
+
+#modules
+NOT_IN_USE.py

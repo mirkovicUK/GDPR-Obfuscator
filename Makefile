@@ -25,4 +25,12 @@ unit-test:
 
 ## Run a single test
 tests:
-	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --testdox -vvrP )
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} pytest --testdox -vvrP)
+
+## Install coverage
+coverage:
+	$(call execute_in_env, $(PIP) install coverage)
+
+## Run the coverage check
+check-coverage:
+	$(call execute_in_env, PYTHONPATH=${PYTHONPATH} coverage run --omit 'venv/*' -m pytest && coverage report -m)
