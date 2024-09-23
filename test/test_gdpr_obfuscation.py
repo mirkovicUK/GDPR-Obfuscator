@@ -586,7 +586,4 @@ def test_setup_logger_sets_correct_loggin_handlers():
         file_handler,
         (logging.FileHandler,logging.StreamHandler)
     )
-
-
-
    
