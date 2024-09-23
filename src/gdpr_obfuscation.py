@@ -7,7 +7,7 @@ import pyarrow.parquet as pq
 import logging
 
 
-def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
+def gdpr_obfuscator(JSON:str) -> bytes:
     """
     Retrieve data ingested to AWS S3 and
     intercept personally identifiable information (PII).
@@ -28,15 +28,7 @@ def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
     {
         "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file1.csv",
         "pii_fields": ["name", "email_address"]
-    }
-
-    :boto_kw: (dictionary) Use this variable to pass arguments to boto client
-        for example: boto_kw = {'aws_access_key_id' : 'Your account access key', ...}
-
-    :pq_kw: (dictionary) Use this variable to pass arguments to
-        pyarrow.parquet write_table function
-        for example: pq_kw = {'compression' : 'GZIP', ...}
-    
+    }    
     :return: bytestream representation of a file with obfuscated data fields
     """
     setup_logger() if not logging.getLogger().hasHandlers() else None
@@ -45,7 +37,7 @@ def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
     bucket, key = get_bucket_and_key(pydict['file_to_obfuscate'])
     data_type = get_data_type(key)
     
-    s3 = boto3.client('s3', **boto_kw)
+    s3 = boto3.client('s3')
     data:bytes = get_data(s3, bucket, key)
 
     if data_type == 'csv':
@@ -53,7 +45,7 @@ def gdpr_obfuscator(JSON:str, *, pq_kw:dict={}, boto_kw:dict={}) -> bytes:
     elif data_type == 'json':
         masked = obfuscate_json(data, pydict['pii_fields']).encode()
     elif data_type == 'parquet':
-        masked = obfuscate_parquet(data, pydict['pii_fields'], **pq_kw)
+        masked = obfuscate_parquet(data, pydict['pii_fields'])
         
     return masked
 
