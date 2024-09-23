@@ -578,7 +578,6 @@ def test_Function_applies_correct_compression_algorithms(parquet_data):
 #   *END*  obsfuscate_parquet() tests
 ####################################################################################
 
-
 @pytest.mark.describe('setup_logger()')
 @pytest.mark.it('Function setup correct_loggin_handlers')
 def test_setup_logger_sets_correct_loggin_handlers():
