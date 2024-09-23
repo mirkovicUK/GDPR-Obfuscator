@@ -1,7 +1,10 @@
 boto3==1.35.0
 pytest==8.3.2
 pytest-testdox==3.1.0
-moto[s3]
+moto[s3]==5.0.15
 botocore==1.35.0
 pyarrow==17.0.0
 coverage==7.6.1
+flake8==7.1.1
+safety==3.2.7
+bandit==1.7.9
