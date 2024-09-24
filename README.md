@@ -42,6 +42,11 @@ Local run
 ```
 pip install -r ./requirements.txt
 ```
+or using Makefile
+```
+make requirements
+```
+
 
 [Back to top](#top)
 
