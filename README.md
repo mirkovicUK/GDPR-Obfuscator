@@ -5,7 +5,7 @@ GDPR Obfuscation tool that can be integrated as a library module into a Python c
 - [About](#about)
 - [Requirements](#requirements)
 - [Tests & Coverage](#tests)
-- [Assumptions_&_Prerequisites](#Assumptions & Prerequisites)
+- [Assumptions & Prerequisites](#Assumptions_&_Prerequisites)
 - [Usage](#Usage)
 
 ## About
@@ -57,7 +57,7 @@ With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100
 
 [Back to top](#top)
 
-## Assumptions & Prerequisites
+## Assumptions_&_Prerequisites
 
 1. Data is stored in CSV, JSON, or parquet format in S3.<br>
 This tool uses External Python libralies: <br>
