@@ -50,7 +50,7 @@ make requirements
 
 [Back to top](#top)
 
-## Tests & Coverage
+## tests
 
 Code is tested with [Pytest](https://docs.pytest.org/en/stable/)<br>
 With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100
