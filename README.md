@@ -81,8 +81,9 @@ The tool should be invoked by sending a JSON string containing:<br>
     the S3 location of the required CSV,JSON or Parquet file for obfuscation<br> 
     and the names of the fields that are required to be obfuscated
 <br>
-{
-    "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv",<br>"pii_fields": ["name", "surname", "email_address"]
+{<br>
+    "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv",<br>
+    "pii_fields": ["name", "surname", "email_address"]<br>
 }
 <br>
 ```
