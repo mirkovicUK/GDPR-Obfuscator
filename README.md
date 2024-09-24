@@ -87,9 +87,9 @@ JSON string format:<br>
     "pii_fields": ["name", "surname", "email_address"]<br>
 }
 <br>
-```
-gdpr_obfuscator(JSON:str)
-```
+
+masked_data = gdpr_obfuscator(JSON:str)
+<br><br>
 
 Example:<br>
 Following example will create resources:[S3](https://aws.amazon.com/s3/),<br> and upload some data for testing, 
