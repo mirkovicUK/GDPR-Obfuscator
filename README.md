@@ -52,7 +52,7 @@ With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100
 
 [Back to top](#top)
 
-## Assumptions_&_Prerequisites
+## Assumptions_and_Prerequisites
 
 1. Data is stored in CSV, JSON, or parquet format in S3.<br>
 This tool uses External Python libralies: <br>
