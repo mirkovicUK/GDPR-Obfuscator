@@ -47,7 +47,7 @@ pip install -r ./requirements.txt
 
 ## Tests & Coverage
 
-Code is tested with [Pytest](https://docs.pytest.org/en/stable/)
+Code is tested with [Pytest](https://docs.pytest.org/en/stable/)<br>
 With test coverage of %100 
 
 [Back to top](#top)
