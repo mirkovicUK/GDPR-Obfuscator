@@ -4,7 +4,7 @@ GDPR Obfuscation tool that can be integrated as a library module into a Python c
 ## Table of Contents
 - [About](#about)
 - [Requirements](#requirements)
-- [Tests & Coverage](#tests)
+- [Tests & Coverage](#Tests & Coverage)
 - [Assumptions & Prerequisites](#Assumptions_&_Prerequisites)
 - [Usage](#Usage)
 
