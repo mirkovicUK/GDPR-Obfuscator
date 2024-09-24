@@ -72,11 +72,11 @@ This tool uses External Python libralies: <br>
 ## Usage
 pip install
 ```
-pip install "git+https://github.com/mirkovicUK/GDPR-Obfuscator.git"
+pip install "git+https://github.com/mirkovicUK/GDPR-Obfuscator.git@pip"
 ```
 Imports
 ```
-from  src.gdpr_obfuscation import gdpr_obfuscator
+from gdpr.obfuscator import gdpr_obfuscator
 ```
 The tool should be invoked by sending a JSON string containing:<br>
     the S3 location of the required CSV,JSON or Parquet file for obfuscation<br> 
@@ -104,7 +104,7 @@ aws_secret_access_key= 'Your account secret access key'<br>
 region_name = 'region_name'<br>
 
 ```
-from  src.gdpr_obfuscation import gdpr_obfuscator
+from gdpr.obfuscator import gdpr_obfuscator
 from dotenv import load_dotenv, dotenv_values
 from datetime import date, timedelta
 from random import randint, choice
