@@ -4,7 +4,7 @@ GDPR Obfuscation tool that can be integrated as a library module into a Python c
 ## Table of Contents
 - [About](#about)
 - [Requirements](#requirements)
-- [Tests_&_Coverage](#Tests_&_Coverage)
+- [Tests_and_Coverage](#Tests_and_Coverage)
 - [Assumptions_&_Prerequisites](#Assumptions_&_Prerequisites)
 - [Usage](#Usage)
 
@@ -33,11 +33,6 @@ should be anonymised.
 
 Ensure you have installed latest python version.
 
-Check your python version
-```
-python --version
-```
-
 Local run
 ```
 pip install -r ./requirements.txt
@@ -50,7 +45,7 @@ make requirements
 
 [Back to top](#top)
 
-## Tests_&_Coverage
+## Tests_and_Coverage
 
 Code is tested with [Pytest](https://docs.pytest.org/en/stable/)<br>
 With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100
