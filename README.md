@@ -7,6 +7,7 @@ GDPR Obfuscation tool that can be integrated as a library module into a Python c
 - [Tests_and_Coverage](#Tests_and_Coverage)
 - [Assumptions_and_Prerequisites](#Assumptions_and_Prerequisites)
 - [Usage](#Usage)
+- [Example](#Example)
 
 ## About
 
@@ -91,7 +92,7 @@ JSON string format:<br>
 masked_data = gdpr_obfuscator(JSON:str)
 <br><br>
 
-Example:<br>
+## Example:<br>
 Following example will create resources:[S3](https://aws.amazon.com/s3/),<br> and upload some data for testing, 
 example is designed to clean all resources after execution , and to work with AWS Free Tier.
 
