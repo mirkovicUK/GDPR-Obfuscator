@@ -1,4 +1,4 @@
-from src.gdpr_obfuscation import get_bucket_and_key, \
+from src.gdpr_obfuscator import get_bucket_and_key, \
         get_data_type, UnsupportedData, gdpr_obfuscator, \
         get_data, obfuscate_csv, obfuscate_json, \
         obfuscate_parquet, setup_logger
