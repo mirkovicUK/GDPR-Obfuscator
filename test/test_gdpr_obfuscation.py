@@ -23,9 +23,9 @@ import pyarrow.parquet as pq
 
 
 @pytest.fixture
-def csv_data():
+def csv_data() -> tuple[str, str]:
     """
-    :returns: (tuple) csv data structured for boto3 put_object(),
+    :returns: (tuple[str, str]) csv data structured for boto3 put_object(),
         and expected csv data for assertion masking ['name', 'country']
     """
     csv_buffer = StringIO()
@@ -48,9 +48,9 @@ def csv_data():
 
 
 @pytest.fixture
-def json_data():
+def json_data() -> tuple[str, bytes]:
     """
-    returns: (tuple) json data structured for boto3 put_object(),
+    returns: (tuple[str, bytes]) json data structured for boto3 put_object(),
         and expected json data for assertion after masking
         pii fields ['name', 'country']
     """
@@ -72,11 +72,11 @@ def json_data():
 
 
 @pytest.fixture
-def parquet_data():
+def parquet_data() -> tuple[bytes, bytes]:
     """
-    :return: (tuple) parquet_data structured for boto3 put_object(),
-        and expected_parquet_data for assertion after masking
-        pii fields ['id', 'name', 'post_code', 'some_column']
+    :return: (tuple[bytes, bytes]) parquet_data structured for
+        boto3 put_object(),and expected_parquet_data for assertion
+        after masking pii fields ['id', 'name', 'post_code', 'some_column']
     """
     size = 100000
     pydict = {
@@ -108,7 +108,11 @@ def parquet_data():
 
 # Arrange
 @pytest.fixture
-def csv_json_parquet(csv_data, json_data, parquet_data):
+def csv_json_parquet(
+    csv_data: tuple[str, str],
+    json_data: tuple[str, bytes],
+    parquet_data: tuple[bytes, bytes]
+) -> dict[str, tuple[str | bytes, str | bytes]]:
     """
     Fixture to arrange data
     :return: {

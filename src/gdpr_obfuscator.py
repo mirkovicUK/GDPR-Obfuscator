@@ -126,7 +126,7 @@ def obfuscate_csv(data: str, pii_fields: list) -> str:
 
     :param: data (string) csv data
     :param: pii_fields (list) of the names of the fields that to be obfuscated
-    :return: csv file with pii masked
+    :return: (str) csv file with pii masked
     """
     dict_reader = csv.DictReader(StringIO(data))
     masked = []
