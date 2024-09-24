@@ -4,7 +4,7 @@ GDPR Obfuscation tool that can be integrated as a library module into a Python c
 ## Table of Contents
 - [About](#about)
 - [Requirements](#requirements)
-- [Tests & Coverage](#Tests & Coverage)
+- [Tests & Coverage](#Tests_&_Coverage)
 - [Assumptions & Prerequisites](#Assumptions_&_Prerequisites)
 - [Usage](#Usage)
 
@@ -50,7 +50,7 @@ make requirements
 
 [Back to top](#top)
 
-## tests
+## Tests_&_Coverage
 
 Code is tested with [Pytest](https://docs.pytest.org/en/stable/)<br>
 With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100
