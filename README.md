@@ -45,20 +45,10 @@ pip install -r ./requirements.txt
 
 [Back to top](#top)
 
-## Tests
+## Tests & Coverage
 
 Code is tested with [Pytest](https://docs.pytest.org/en/stable/)
-```
-pip install pytest
-```
-And decorated with [pytest-testdox](https://pypi.org/project/pytest-testdox/) for better readability.
-```
-pip install pytest-testdox
-```
-Run tests
-```
-pytest --disable-warnings --testdox -vvrP
-```
+With test coverage of %100 
 
 [Back to top](#top)
 
