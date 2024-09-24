@@ -23,6 +23,8 @@ should be anonymised.
 
 **It is expected that the code will use the AWS SDK for Python (boto3).**
 
+**It is expected that the code will use the PyArrow when pyarrow when handling parquet data.**
+
 **The library is suitable for deployment on a platform within the AWS ecosystem, such as EC2, ECS, or Lambda.**
 
 [Back to top](#top)
