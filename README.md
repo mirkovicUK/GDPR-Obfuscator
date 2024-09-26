@@ -109,10 +109,10 @@ example is designed to clean all resources after execution , and to work with AW
 
 Example will expect AWS credentials in python .env file as this.
 
-bucket='unique bucket name'<br>
-aws_access_key_id='Your account access key'<br>
-aws_secret_access_key= 'Your account secret access key'<br>
-region_name = 'region_name'<br>
+bucket='unique bucket name' : mandatory<br>
+aws_access_key_id='Your account access key' :optional<br>
+aws_secret_access_key= 'Your account secret access key' :optional<br>
+region_name = 'region_name' :mandatory<br>
 
 ```
 from gdpr.obfuscator import gdpr_obfuscator,setup_logger
