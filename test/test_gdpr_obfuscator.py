@@ -232,27 +232,15 @@ def test_raise_NoSuchBucket_with_wrong_bucket(csv_data):
 @pytest.mark.it('Function mask correct fields')
 @mock_aws
 def test_Function_mask_correct_fields_csv(csv_data):
-    csv_data_s3, expected_csv_data = csv_data
-
-    s3_file = 's3://test_bucket/some_folder/file.csv'
-    bucket, key = get_bucket_and_key(s3_file)
-    client = boto3.client('s3', region_name="us-east-1")
-    client.create_bucket(Bucket=bucket)
-    client.put_object(
-        Body=csv_data_s3,
-        Bucket=bucket,
-        Key=key)
-
-    s3_data = get_data(client, bucket, key).decode()
+    csv_data, expected_csv_data = csv_data
     pii_fields = ['name', 'country']
-    masked_csv = obfuscate_csv(s3_data, pii_fields)
+    masked_csv = obfuscate_csv(csv_data, pii_fields)
 
     assert masked_csv == expected_csv_data
 
 
 @pytest.mark.describe('obfuscate_csv()')
 @pytest.mark.it('Function returns_empty_str_when_no_data_is_passed')
-@mock_aws
 def test_Function_returns_empty_str_when_no_data_is_passed():
     masked_csv = obfuscate_csv('', ['some_field'])
 
@@ -271,22 +259,10 @@ def test_Is_Pure_function(csv_data):
 
 @pytest.mark.describe('obfuscate_json()')
 @pytest.mark.it('Function mask correct fields')
-@mock_aws
 def test_Function_mask_correct_fields_json(json_data):
-    json_data_s3, expected_json_data = json_data
-
-    s3_file = 's3://test_bucket/some_folder/file.json'
-    bucket, key = get_bucket_and_key(s3_file)
-    client = boto3.client('s3', region_name="us-east-1")
-    client.create_bucket(Bucket=bucket)
-    client.put_object(
-        Body=json_data_s3,
-        Bucket=bucket,
-        Key=key)
-
-    s3_data = get_data(client, bucket, key)
+    json_data, expected_json_data = json_data
     pii_fields = ['name', 'country']
-    masked_data = obfuscate_json(s3_data, pii_fields).encode()
+    masked_data = obfuscate_json(json_data, pii_fields).encode()
     assert expected_json_data == masked_data
 
 
@@ -489,7 +465,7 @@ def test_Function_process_1MB_data_in_less_than_1min():
     headers = ['id', 'name', 'surname', 'country']
     data = []
     counter = 1
-    while sys.getsizeof(data) <= 1000000:
+    while sys.getsizeof(data) <= 1048576:
         data.append([str_counter := str(counter),
                      'test_name' + str_counter,
                      'test_surname' + str_counter,
@@ -542,7 +518,8 @@ def test_Function_mask_correct_fields_parquet(parquet_data):
 def test_Function_keep_columns_order(pii_fields, parquet_data):
     parquet_data, _ = parquet_data
     expected_columns = [
-        'id', 'name',
+        'id',
+        'name',
         'surname',
         'country',
         'address',
