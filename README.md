@@ -5,6 +5,7 @@ GDPR Obfuscation tool that can be integrated as a library module into a Python c
 - [About](#about)
 - [Requirements](#requirements)
 - [Tests_and_Coverage](#Tests_and_Coverage)
+- [PEP8_and_security](#PEP8_and_security)
 - [Assumptions_and_Prerequisites](#Assumptions_and_Prerequisites)
 - [Usage](#Usage)
 - [Example](#Example)
@@ -50,6 +51,16 @@ make requirements
 
 Code is tested with [Pytest](https://docs.pytest.org/en/stable/)<br>
 With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100
+
+[Back to top](#top)
+
+
+## PEP8_and_security
+Code is written in Python, <br>
+PEP8 compliant, tested with [flake8](https://flake8.pycqa.org/en/latest/)<br>
+As well as tested for security vulnerabilities<br>
+dependency vulnerability [safety](https://pypi.org/project/safety/)
+security issues [bandit](https://bandit.readthedocs.io/en/latest/)
 
 [Back to top](#top)
 
