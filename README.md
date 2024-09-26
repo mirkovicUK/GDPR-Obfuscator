@@ -115,7 +115,7 @@ aws_secret_access_key= 'Your account secret access key'<br>
 region_name = 'region_name'<br>
 
 ```
-from gdpr.obfuscator import gdpr_obfuscator
+from gdpr.obfuscator import gdpr_obfuscator,setup_logger
 from dotenv import load_dotenv, dotenv_values
 from datetime import date, timedelta
 from random import randint, choice
@@ -125,8 +125,10 @@ import csv
 import io
 import json
 import sys
+import logging
 
-credentials = dotenv_values() if load_dotenv() else None
+credentials = dotenv_values() if load_dotenv() else {}
+setup_logger() if not logging.getLogger().hasHandlers() else None
 
 # create some student csv data
 headers = ['student_id', 'name', 'course', 'graduation_date', 'email_address']
@@ -155,12 +157,16 @@ csv_writer.writerows(data)
 print(csv_buffer.getvalue())
 
 # create s3 bucket and upload data
-s3 = boto3.client(
-    's3',
-    aws_access_key_id=credentials['aws_access_key_id'],
-    aws_secret_access_key=credentials['aws_secret_access_key'],
-    region_name=credentials['region_name']
-    )
+try:
+    s3 = boto3.client(
+        's3',
+        aws_access_key_id=credentials['aws_access_key_id'],
+        aws_secret_access_key=credentials['aws_secret_access_key'],
+        region_name=credentials['region_name']
+        )
+except KeyError:
+    s3 = boto3.client('s3')
+    
 try:
     response = s3.create_bucket(
         Bucket=credentials['bucket'],
@@ -173,6 +179,10 @@ except ClientError as error:
         pass
     else:
         raise
+except KeyError:
+    logger = logging.getLogger()
+    logger.critical('Set bucket and region name with pyhon .env')
+    raise
 
 # upload data to bucket
 print(f'uploading {sys.getsizeof(csv_buffer.getvalue())} bytes in s3')
