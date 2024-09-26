@@ -58,9 +58,9 @@ With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100
 ## PEP8_and_security
 Code is written in Python, <br>
 PEP8 compliant, tested with [flake8](https://flake8.pycqa.org/en/latest/)<br>
-As well as tested for security vulnerabilities<br>
-dependency vulnerability [safety](https://pypi.org/project/safety/)
-security issues [bandit](https://bandit.readthedocs.io/en/latest/)
+As well as tested for security vulnerabilities:<br>
+dependency vulnerability [safety](https://pypi.org/project/safety/),
+security issues [bandit](https://bandit.readthedocs.io/en/latest/).
 
 [Back to top](#top)
 
