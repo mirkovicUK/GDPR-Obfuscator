@@ -51,6 +51,7 @@ make requirements
 
 Code is tested with [Pytest](https://docs.pytest.org/en/stable/)<br>
 With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100
+see [tests](https://github.com/mirkovicUK/GDPR-Obfuscator/blob/main/test/test_gdpr_obfuscator.py)
 
 [Back to top](#top)
 
