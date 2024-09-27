@@ -39,7 +39,7 @@ Local run
 ```
 pip install -r ./requirements.txt
 ```
-or using Makefile
+or clone repo and run
 ```
 make requirements
 ```
