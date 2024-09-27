@@ -120,27 +120,33 @@ def obfuscate_csv(data: str, pii_fields: list) -> str:
     """
     Pure function that mask pii_fields in data
     Behaviour:
-        :Will return empty str if data is empty
-        :If pii_fields contain fields different than data headers
-            function will update data header to represent this
+        :Will return empty str if receives empty data string
+        :When detect pii_fild that is not present in csv fieldnames
+            function will log with warning level,and disregard that pii_fild.
 
     :param: data (string) csv data
     :param: pii_fields (list) of the names of the fields that to be obfuscated
     :return: (str) csv file with pii masked
     """
+    logger = logging.getLogger(__name__)
+    logger.setLevel('WARNING')
     dict_reader = csv.DictReader(StringIO(data))
+    if dict_reader.fieldnames is None:
+        return str()
+
     masked = []
     for row in dict_reader:
         for field in pii_fields:
-            row[field] = '***'
+            if field in dict_reader.fieldnames:
+                row[field] = '***'
+            else:
+                logger.warning(
+                    f'WARNING pii_field:\'{field}\' not in data...skipping...'
+                )
         masked.append(row)
-    try:
-        headers = list(masked[0].keys())
-    except IndexError:
-        return str()
 
     masked_bufer = StringIO()
-    writer = csv.DictWriter(masked_bufer, headers)
+    writer = csv.DictWriter(masked_bufer, dict_reader.fieldnames)
     writer.writeheader()
     writer.writerows(masked)
     return masked_bufer.getvalue()
@@ -152,20 +158,28 @@ def obfuscate_json(data: bytes, pii_fields: list) -> str:
     Behaviour:
         :Will return empty serilized list if data is empty or wrong format
             expect bytes data in format [{data1}, {data2} ...]
-        :If pii_fields contain fields different than dict key
-            function will update data vith new key:value to represent this
+        :When detect pii_fild that is not present in csv fieldnames
+            function will log with warning level,and disregard that pii_fild.
 
     :param: data (bytes) representation of json data
     :param: pii_fields (list) of the names of the fields that to be obfuscated
     :return: parsed object with pii masked
     """
+    logger = logging.getLogger(__name__)
+    logger.setLevel('WARNING')
     try:
         data_list = json.loads(data)
+        keys = list(data_list[0].keys())
     except json.decoder.JSONDecodeError:
         data_list = []
     for x in data_list:
         for y in pii_fields:
-            x[y] = '***'
+            if y in keys:
+                x[y] = '***'
+            else:
+                logger.warning(
+                    f'WARNING pii_field:\'{y}\' not in data...skipping...'
+                )
     return json.dumps(data_list)
 
 
@@ -182,7 +196,7 @@ def obfuscate_parquet(data: bytes, pii_fields: list, **kwargs) -> bytes:
         Use kwargs to modify default behaviour.
 
         :When detect pii_fild that is not present in table function
-        will log to cloud wach on warning level,and disregard that pii_fild.
+        will log with warning level,and disregard that pii_fild.
 
     :param: data (bytes) parquet data
     :param: pii_fields (list) of the names of the fields to be obfuscated
@@ -224,7 +238,7 @@ def setup_logger():
 
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
     formatter = logging.Formatter(
-        '[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s: %(lineno)d] %(message)s',
+        '[%(asctime)s] %(levelname)s [%(filename)s.%(funcName)s:%(lineno)d] %(message)s',
         datefmt='%a, %d %b %Y %H:%M:%S')
     stdout_handler.setFormatter(formatter)
 

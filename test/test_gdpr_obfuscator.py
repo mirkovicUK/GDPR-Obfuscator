@@ -182,8 +182,20 @@ def test_get_data_return_corect_data(csv_data):
     pylist = [row for row in reader]
 
     assert pylist[0] == ['id', 'name', 'surname', 'country']
-    assert pylist[1:] == [['1', 'test_name1', 'test_surname1', 'test_country1'],
-                          ['2', 'test_name2', 'test_surname2', 'test_country2']]
+    assert pylist[1:] == [
+        [
+            '1',
+            'test_name1',
+            'test_surname1',
+            'test_country1'
+        ],
+        [
+            '2',
+            'test_name2',
+            'test_surname2',
+            'test_country2'
+        ]
+    ]
     assert s3_data == csv_data_s3
 
 
@@ -257,6 +269,29 @@ def test_Is_Pure_function(csv_data):
     assert pii_fields == ['name', 'country']
 
 
+@pytest.mark.describe('obfuscate_csv()')
+@pytest.mark.it('Function skip pii that is not in data_csv')
+def test_Function_skip_pii_that_is_not_in_data(csv_data):
+    csv_data, expected_csv_data = csv_data
+    pii_fields = ['name', 'country', 'wrong_column_name']
+    masked_csv = obfuscate_csv(csv_data, pii_fields)
+    assert masked_csv == expected_csv_data
+    assert masked_csv.split('\r\n')[0] == csv_data.split('\r\n')[0]
+
+
+@pytest.mark.describe('obfuscate_csv()')
+@pytest.mark.it('Function logs when detect pii that is not in data csv')
+def test_Function_logs_when_detect_pii_that_is_not_in_data_csv(
+    csv_data,
+    caplog
+):
+    csv_data, _ = csv_data
+    pii_fields = ['name', 'country', 'wrong_column_name']
+    obfuscate_csv(csv_data, pii_fields)
+    assert 'WARNING' in caplog.text
+    assert 'pii_field:\'wrong_column_name\' not in data' in caplog.text
+
+
 @pytest.mark.describe('obfuscate_json()')
 @pytest.mark.it('Function mask correct fields')
 def test_Function_mask_correct_fields_json(json_data):
@@ -280,6 +315,28 @@ def test_Is_pure_function():
     pii_fields = ['name', 'country']
     obfuscate_json(b'', pii_fields)
     assert pii_fields == ['name', 'country']
+
+
+@pytest.mark.describe('obfuscate_json()')
+@pytest.mark.it('Function skip pii that is not in data json')
+def test_Function_skip_pii_that_is_not_in_data_json(json_data):
+    json_data, expected_json_data = json_data
+    pii_fields = ['name', 'country', 'wrong_column_name']
+    masked_data = obfuscate_json(json_data, pii_fields).encode()
+    assert masked_data == expected_json_data
+
+
+@pytest.mark.describe('obfuscate_json()')
+@pytest.mark.it('Function logs when detect pii that is not in data json')
+def test_Function_logs_when_detect_pii_that_is_not_in_data_json(
+    json_data,
+    caplog
+):
+    json_data, _ = json_data
+    pii_fields = ['name', 'country', 'wrong_column_name']
+    obfuscate_json(json_data, pii_fields).encode()
+    assert 'WARNING' in caplog.text
+    assert 'pii_field:\'wrong_column_name\' not in data' in caplog.text
 
 
 ########################################################################
