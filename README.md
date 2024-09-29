@@ -51,7 +51,7 @@ make requirements
 
 Code is tested with [Pytest](https://docs.pytest.org/en/stable/), 
 With test [coverage](https://coverage.readthedocs.io/en/7.6.1/) of %100<br>
-see [tests](https://github.com/mirkovicUK/GDPR-Obfuscator/blob/main/test/test_gdpr_obfuscator.py) for more details.
+See [tests](https://github.com/mirkovicUK/GDPR-Obfuscator/blob/main/test/test_gdpr_obfuscator.py) for more details.
 
 [Back to top](#top)
 
@@ -101,7 +101,7 @@ JSON string format:<br>
 }
 <br>
 
-masked_data = gdpr_obfuscator(JSON:str)
+masked_data = gdpr_obfuscator(JSON: str)
 <br><br>
 
 ## Example:<br>
