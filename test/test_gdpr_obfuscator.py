@@ -118,7 +118,7 @@ def csv_json_parquet(
     :return: {
                 'csv': csv_data,
                 'json': json_data,
-                'parquet': parquet_data
+                'parquet': parquet_data}
     """
     d = {
         'csv': csv_data,
