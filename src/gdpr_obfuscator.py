@@ -22,6 +22,24 @@ def gdpr_obfuscator(JSON: str) -> bytes:
     Exept csv, json or parquet data file format
         JSON data format = [{data1}, {data2}...]
 
+    Behaviour:
+        csv data:
+            :Will return empty str if receives empty data string
+            :When detect pii_fild that is not present in csv fieldnames
+            function will log with warning level,and disregard that pii_fild.
+
+        json data:
+            :Will return empty serilized list if data is empty or wrong format
+            :When detect pii_fild that is not present in fieldnames
+            function will log with warning level,and disregard that pii_fild.
+
+        parquet data:
+            :PyArrow Parquete engine write parquet file with default params.
+            as per pyarrow.parquet.write_table function.Use kwargs to modify
+            default behaviour.
+            :When detect pii_fild that is not present in table function
+            will log with warning level,and disregard that pii_fild.
+
     :param: JSON (string) containing:
     "file_to_obfuscate" key:
         the S3 location of the required file for obfuscation
@@ -158,7 +176,7 @@ def obfuscate_json(data: bytes, pii_fields: list) -> str:
     Behaviour:
         :Will return empty serilized list if data is empty or wrong format
             expect bytes data in format [{data1}, {data2} ...]
-        :When detect pii_fild that is not present in csv fieldnames
+        :When detect pii_fild that is not present in fieldnames
             function will log with warning level,and disregard that pii_fild.
 
     :param: data (bytes) representation of json data
@@ -191,8 +209,8 @@ def obfuscate_parquet(data: bytes, pii_fields: list, **kwargs) -> bytes:
     and create a new Parquet file, while keeping column order.
 
     Default Behaviour:
-        :PyArrow Parquete engine default params as per
-        pyarrow.parquet.write_table function.
+        :PyArrow Parquete engine write parquet file with default params.
+        as per pyarrow.parquet.write_table function.
         Use kwargs to modify default behaviour.
 
         :When detect pii_fild that is not present in table function
