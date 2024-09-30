@@ -82,7 +82,7 @@ This tool uses External Python libralies: <br>
 [Back to top](#top)
 
 ## Usage
-pip install
+pip install from pip branch
 ```
 pip install "git+https://github.com/mirkovicUK/GDPR-Obfuscator.git@pip"
 ```
@@ -90,14 +90,25 @@ Imports
 ```
 from gdpr.obfuscator import gdpr_obfuscator
 ```
+<br>
+Alternatively clone the repo:
+```
+git clone https://github.com/mirkovicUK/GDPR-Obfuscator.git
+```
+Import:
+```
+from src.gdpr_obfuscator import gdpr_obfuscator
+```
+<br><br>
+
 The tool should be invoked by sending a JSON string containing:<br>
     the S3 location of the required CSV,JSON or Parquet file for obfuscation<br> 
     and the names of the fields that are required to be obfuscated
 <br><br>
 JSON string format:<br>
 {<br>
-    "file_to_obfuscate": "s3://my_ingestion_bucket/new_data/file.csv",<br>
-    "pii_fields": ["name", "surname", "email_address"]<br>
+    "file_to_obfuscate": "s3://bucket_name/path_to_data/file.csv",<br>
+    "pii_fields": ["name", "surname", "other_filelds_to_mask"]<br>
 }
 <br>
 
