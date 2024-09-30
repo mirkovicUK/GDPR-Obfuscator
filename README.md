@@ -99,7 +99,8 @@ Import:
 ```
 from src.gdpr_obfuscator import gdpr_obfuscator
 ```
-<br><br>
+---------------------------------------------------------------------------------
+<br>
 
 The tool should be invoked by sending a JSON string containing:<br>
     the S3 location of the required CSV,JSON or Parquet file for obfuscation<br> 
