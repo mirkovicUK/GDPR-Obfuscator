@@ -90,7 +90,7 @@ Imports
 ```
 from gdpr.obfuscator import gdpr_obfuscator
 ```
-
+---------------------------------------------------------------------------------
 Alternatively clone the repo:
 ```
 git clone https://github.com/mirkovicUK/GDPR-Obfuscator.git
