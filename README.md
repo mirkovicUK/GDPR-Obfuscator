@@ -117,7 +117,7 @@ masked_data = gdpr_obfuscator(JSON: str)
 <br><br>
 
 ## Example:<br>
-Following [example]() will create resources:[S3](https://aws.amazon.com/s3/),<br> and upload some data for testing, 
+Following [example](https://github.com/mirkovicUK/GDPR-Obfuscator/blob/main/example/example.py) will create resources:[S3](https://aws.amazon.com/s3/),<br> and upload some data for testing, 
 example is designed to clean all resources after execution , and to work with AWS Free Tier.
 
 Example will expect AWS credentials in python .env file as this.
